@@ -1,6 +1,16 @@
 #!/bin/bash
+
+# Trap per gestire Ctrl+C
+cleanup() {
+    echo -e "\nAnalisi interrotta - tutti i processi terminati!"
+    [ ! -z "$SPIN_PID" ] && kill $SPIN_PID 2>/dev/null
+    pkill -f "ffmpeg.*loudnorm" 2>/dev/null
+    exit 130
+}
+trap cleanup SIGINT
+
 # ==============================================================================
-# ducking_auto_cartoni.sh v1.0 - Audio Ottimizzato per Cartoni e Musical
+# ducking_auto_cartoni.sh - Audio Ottimizzato per Cartoni e Musical
 # ==============================================================================
 # Preset auto-adattivo per film d'animazione con analisi intelligente del mix audio
 # 
@@ -16,7 +26,7 @@
 # Controllo argomenti
 INPUT_FILE="$1"
 OUTPUT_FILE="${INPUT_FILE%.*}_cartoon_ducked.mkv"
-BITRATE="384k"
+BITRATE="640k"
 [ ! -z "$2" ] && BITRATE="$2"
 
 if [ -z "$INPUT_FILE" ]; then
@@ -81,15 +91,15 @@ echo "RACCOMANDAZIONI AUTOMATICHE PER CARTONI/MUSICAL:"
 
 # Parametri base per cartoni animati e musical
 VOICE_BOOST=3.2
-LFE_REDUCTION=0.80
+LFE_REDUCTION=0.78
 LFE_DUCK_THRESHOLD=0.012
 LFE_DUCK_RATIO=3.5
 FX_DUCK_THRESHOLD=0.012
 FX_DUCK_RATIO=2.8
-FX_ATTACK=10
-FX_RELEASE=200
-LFE_ATTACK=15
-LFE_RELEASE=250
+FX_ATTACK=40
+FX_RELEASE=700
+LFE_ATTACK=50
+LFE_RELEASE=900
 LFE_HP_FREQ=45
 LFE_LP_FREQ=100
 LFE_CROSS_POLES=2
@@ -121,40 +131,12 @@ else
     echo "APPLICATO: Taglio LFE standard (${LFE_HP_FREQ}Hz) per fondamenti orchestrali"
 fi
 
-# Rilevamento contenuti musical vs cartoni standard
-if [ $(awk "BEGIN {print ($LRA > 10) ? 1 : 0}") -eq 1 ]; then
-    # Per musical con ampia dinamica (es. classici Disney)
-    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO - 0.3}")
-    LFE_DUCK_RATIO=$(awk "BEGIN {print $LFE_DUCK_RATIO - 0.3}")
-    FX_RELEASE=$(awk "BEGIN {print $FX_RELEASE + 30}")
-    VOICE_EQ="highpass=f=80,equalizer=f=200:width_type=q:w=2.0:g=1.0,equalizer=f=1000:width_type=q:w=1.8:g=1.7,equalizer=f=4000:width_type=q:w=1.5:g=2.2"
-    SURROUND_BOOST=2.5
-    echo "APPLICATO: Profilo musical con preservazione dinamica orchestrale"
-    echo "APPLICATO: EQ specializzato per voci cantate con brillantezza acuta"
-elif [ $(awk "BEGIN {print ($LRA < 7 && $LUFS > -18) ? 1 : 0}") -eq 1 ]; then
-    # Per cartoni moderni con dinamica compressa
-    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.2}")
-    FX_DUCK_THRESHOLD=0.010
-    VOICE_EQ="highpass=f=80,equalizer=f=200:width_type=q:w=2.0:g=1.0,equalizer=f=1000:width_type=q:w=1.8:g=1.3,equalizer=f=3000:width_type=q:w=1.5:g=1.5"
-    SURROUND_BOOST=2.0
-    echo "APPLICATO: Profilo cartone moderno con bilanciamento voce/musica"
-else
-    # Per cartoni standard
-    VOICE_EQ="highpass=f=80,equalizer=f=200:width_type=q:w=2.0:g=1.0,equalizer=f=1000:width_type=q:w=1.8:g=1.5,equalizer=f=4000:width_type=q:w=1.5:g=2.0"
-    SURROUND_BOOST=2.2
-    echo "APPLICATO: Profilo cartone standard con buon bilanciamento generale"
-fi
+# Regole adattive per FX Ducking
+VOICE_EQ="highpass=f=80,equalizer=f=200:width_type=q:w=2.0:g=1.0,equalizer=f=1000:width_type=q:w=1.8:g=1.7,equalizer=f=4000:width_type=q:w=1.5:g=2.2"
 
 # EQ LFE per orchestrali e musical
-if [ $(awk "BEGIN {print ($LRA > 10) ? 1 : 0}") -eq 1 ]; then
-    # Per musical con orchestra prominente
-    LFE_EQ="equalizer=f=60:width_type=q:w=1.4:g=1.5,equalizer=f=100:width_type=q:w=1.6:g=0.7"
-    echo "APPLICATO: LFE orchestrale calibrato per sezioni d'archi e timpani"
-else
-    # Per cartoni standard
-    LFE_EQ="equalizer=f=60:width_type=q:w=1.4:g=1.3,equalizer=f=100:width_type=q:w=1.6:g=1.0"
-    echo "APPLICATO: LFE standard per cartoni animati"
-fi
+LFE_EQ="equalizer=f=35:width_type=q:w=1.6:g=0.6,equalizer=f=75:width_type=q:w=1.8:g=0.4"
+echo "APPLICATO: LFE orchestrale arioso calibrato per definizione e musicalità"
 
 # Surround per ambientazione e musica
 SURROUND_EQ="equalizer=f=400:width_type=q:w=2.0:g=1.3,equalizer=f=2000:width_type=q:w=2.2:g=1.5,equalizer=f=7000:width_type=q:w=2.0:g=2.0"
@@ -195,11 +177,11 @@ ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
 [LFE]${LFE_FILTER}[LFElow]; \
 [LFElow][FCsidechain]sidechaincompress=${LFE_SC_PARAMS}[LFEduck]; \
 [FL][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FL_comp]; \
-[FL_comp]volume=0.85[FLduck]; \
+[FL_comp]volume=0.92[FLduck]; \
 [FR][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FR_comp]; \
-[FR_comp]volume=0.85[FRduck]; \
-[SL]volume=${SURROUND_BOOST},${SURROUND_EQ}[SLduck]; \
-[SR]volume=${SURROUND_BOOST},${SURROUND_EQ}[SRduck]; \
+[FR_comp]volume=0.92[FRduck]; \
+[SL]volume=1.6,${SURROUND_EQ}[SLduck]; \
+[SR]volume=1.6,${SURROUND_EQ}[SRduck]; \
 [FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}" \
 -map 0:v -c:v copy \
 -c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice Cartoon 5.1" \

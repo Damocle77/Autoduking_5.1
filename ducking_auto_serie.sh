@@ -1,6 +1,16 @@
 #!/bin/bash
+
+# Trap per gestire Ctrl+C
+cleanup() {
+    echo -e "\nAnalisi interrotta - tutti i processi terminati!"
+    [ ! -z "$SPIN_PID" ] && kill $SPIN_PID 2>/dev/null
+    pkill -f "ffmpeg.*loudnorm" 2>/dev/null
+    exit 130
+}
+trap cleanup SIGINT
+
 # ==============================================================================
-# ducking_auto_serie.sh v1.0 - Audio Ottimizzato per Serie TV di Genere
+# ducking_auto_serie.sh - Audio Ottimizzato per Serie TV di Genere
 # ==============================================================================
 # Preset auto-adattivo per serie TV con analisi intelligente del mix audio
 # 
@@ -98,15 +108,15 @@ echo "RACCOMANDAZIONI AUTOMATICHE SERIE TV:"
 
 # Parametri base (preset serie genere)
 VOICE_BOOST=3.6
-LFE_REDUCTION=0.70
+LFE_REDUCTION=0.74
 LFE_DUCK_THRESHOLD=0.006
-LFE_DUCK_RATIO=4.3
+LFE_DUCK_RATIO=3.5
 FX_DUCK_THRESHOLD=0.009
-FX_DUCK_RATIO=3.7
+FX_DUCK_RATIO=2.5
 FX_ATTACK=15
-FX_RELEASE=280
-LFE_ATTACK=18
-LFE_RELEASE=300
+FX_RELEASE=300
+LFE_ATTACK=20
+LFE_RELEASE=350
 LFE_HP_FREQ=35
 LFE_LP_FREQ=100
 LFE_CROSS_POLES=2
@@ -158,18 +168,8 @@ else
 fi
 
 # Ottimizzazione specifica per serie fantasy/sci-fi/horror
-if [ $(awk "BEGIN {print ($LRA > 10) ? 1 : 0}") -eq 1 ]; then
-    SURROUND_BOOST=2.2
-    SURROUND_EQ="equalizer=f=180:width_type=q:w=2.0:g=1.3,equalizer=f=2200:width_type=q:w=2.2:g=1.5,equalizer=f=6800:width_type=q:w=2.0:g=1.7"
-    LFE_EQ="equalizer=f=45:width_type=q:w=1.3:g=2.5,equalizer=f=70:width_type=q:w=1.6:g=1.8"
-    echo "APPLICATO: Surround potenziato per serie fantasy/sci-fi con ampia dinamica"
-    echo "APPLICATO: LFE più incisivo per effetti speciali e atmosfere immersive"
-else
-    SURROUND_BOOST=2.0
-    SURROUND_EQ="equalizer=f=180:width_type=q:w=2.0:g=1.2,equalizer=f=2200:width_type=q:w=2.2:g=1.3,equalizer=f=6800:width_type=q:w=2.0:g=1.5"
-    LFE_EQ="equalizer=f=55:width_type=q:w=1.4:g=2.0,equalizer=f=70:width_type=q:w=1.6:g=1.6"
-    echo "APPLICATO: Surround standard per serie con dinamica media"
-fi
+LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=65:width_type=q:w=1.8:g=0.4"
+echo "APPLICATO: LFE cinematografico arioso per definizione e impatto"
 
 # Protezione anti-scoppio LFE per serie horror/fantasy con picchi elevati
 if [ $(awk "BEGIN {print ($PEAK > -1.5 && $LRA > 12) ? 1 : 0}") -eq 1 ]; then
@@ -214,11 +214,11 @@ ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
 [LFE]${LFE_FILTER}[LFElow]; \
 [LFElow][FCsidechain]sidechaincompress=${LFE_SC_PARAMS}[LFEduck]; \
 [FL][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FL_comp]; \
-[FL_comp]volume=0.77[FLduck]; \
+[FL_comp]volume=0.9[FLduck]; \
 [FR][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FR_comp]; \
-[FR_comp]volume=0.77[FRduck]; \
-[SL]volume=${SURROUND_BOOST},${SURROUND_EQ}[SLduck]; \
-[SR]volume=${SURROUND_BOOST},${SURROUND_EQ}[SRduck]; \
+[FR_comp]volume=0.9[FRduck]; \
+[SL]volume=1.8[SLduck]; \
+[SR]volume=1.8[SRduck]; \
 [FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}" \
 -map 0:v -c:v copy \
 -c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice Serie 5.1" \

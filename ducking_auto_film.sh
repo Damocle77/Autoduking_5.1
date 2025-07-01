@@ -1,6 +1,16 @@
 #!/bin/bash
+
+# Trap per gestire Ctrl+C
+cleanup() {
+    echo -e "\nAnalisi interrotta - tutti i processi terminati!"
+    [ ! -z "$SPIN_PID" ] && kill $SPIN_PID 2>/dev/null
+    pkill -f "ffmpeg.*loudnorm" 2>/dev/null
+    exit 130
+}
+trap cleanup SIGINT
+
 # ==============================================================================
-# ducking_auto_film.sh v1.0 - Audio Cinematografico Ottimizzato
+# ducking_auto_film.sh - Audio Cinematografico Ottimizzato
 # ==============================================================================
 # Preset auto-adattivo per film con analisi intelligente del mix audio
 # 
@@ -16,7 +26,7 @@
 # Controllo argomenti
 INPUT_FILE="$1"
 OUTPUT_FILE="${INPUT_FILE%.*}_film_ducked.mkv"
-BITRATE="384k"
+BITRATE="768k"
 [ ! -z "$2" ] && BITRATE="$2"
 
 if [ -z "$INPUT_FILE" ]; then
@@ -29,7 +39,7 @@ echo "==================== ANALISI LOUDNESS ===================="
 echo "Scansione del contenuto audio in corso..."
 echo "Misurazione EBU R128 integrated loudness..."
 echo "Rilevamento true peak e loudness range..."
-echo "L'analisi richiede circa 3-4 minuti per film..."
+echo "L'analisi richiede circa 20 minuti per 2h di video..."
 
 # Spin indicator elegante
 spin_chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
@@ -98,10 +108,10 @@ echo "RACCOMANDAZIONI AUTOMATICHE CINEMATOGRAFICHE:"
 
 # Parametri base per film cinematografici
 VOICE_BOOST=3.5
-LFE_REDUCTION=0.68
+LFE_REDUCTION=0.74
 LFE_DUCK_THRESHOLD=0.005
-LFE_DUCK_RATIO=4.5
-FX_DUCK_RATIO=3.5
+LFE_DUCK_RATIO=3.5
+FX_DUCK_RATIO=2.5
 FX_ATTACK=15
 FX_RELEASE=300
 LFE_ATTACK=20
@@ -141,8 +151,6 @@ fi
 if [ $(awk "BEGIN {print ($PEAK > -1.5 && $LRA > 15) ? 1 : 0}") -eq 1 ]; then
     # Mix con picchi molto alti E ampia dinamica: rischio "scoppio" LFE
     LFE_REDUCTION=$(awk "BEGIN {print $LFE_REDUCTION - 0.15}")
-    # Riduzione boost bassi profondi per protezione anti-scoppio
-    LFE_EQ="equalizer=f=35:width_type=q:w=1.2:g=2.0,equalizer=f=80:width_type=q:w=1.4:g=1.8"
     echo "APPLICATO: Protezione anti-scoppio LFE per mix con picchi elevati e ampia dinamica"
 fi
 
@@ -168,9 +176,7 @@ COMPAND_PARAMS="attacks=0.02:decays=0.05:points=-60/-60|-25/-25|-12/-8:soft-knee
 SIDECHAIN_PREP="highpass=f=100,lowpass=f=4000,volume=3.0,compand=${COMPAND_PARAMS},agate=threshold=-38dB:ratio=1.8:attack=2:release=5000"
 
 # EQ LFE cinematografico (se non già definito dalla protezione anti-scoppio)
-if [ -z "$LFE_EQ" ]; then
-    LFE_EQ="equalizer=f=35:width_type=q:w=1.2:g=3.0,equalizer=f=80:width_type=q:w=1.4:g=1.8"
-fi
+LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=65:width_type=q:w=1.8:g=0.4"
 
 # Filtri surround
 SURROUND_EQ="equalizer=f=180:width_type=q:w=1.8:g=1.1,equalizer=f=2500:width_type=q:w=2.0:g=1.4"
@@ -207,9 +213,9 @@ ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
 [LFE]${LFE_FILTER}[LFElow]; \
 [LFElow][FCsidechain]sidechaincompress=${LFE_SC_PARAMS}[LFEduck]; \
 [FL][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FL_comp]; \
-[FL_comp]volume=0.75[FLduck]; \
+[FL_comp]volume=0.9[FLduck]; \
 [FR][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FR_comp]; \
-[FR_comp]volume=0.75[FRduck]; \
+[FR_comp]volume=0.9[FRduck]; \
 [SL]volume=1.8,${SURROUND_EQ}[SLduck]; \
 [SR]volume=1.8,${SURROUND_EQ}[SRduck]; \
 [FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}" \
