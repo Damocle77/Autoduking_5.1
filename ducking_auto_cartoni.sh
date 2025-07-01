@@ -1,0 +1,242 @@
+#!/bin/bash
+# ==============================================================================
+# ducking_auto_cartoni.sh v1.0 - Audio Ottimizzato per Cartoni e Musical
+# ==============================================================================
+# Preset auto-adattivo per film d'animazione con analisi intelligente del mix audio
+# 
+# + Analisi LUFS/True Peak completa con valutazione del contenuto
+# + Ottimizzazione adattiva per dialoghi e voci cantate perfettamente intellegibili
+# + Ducking delicato per bilanciare voci, musica e effetti
+# + Calibrato per cartoni Disney, Pixar, musical e film d'animazione
+# + EQ specializzato per voci cantate e arrangiamenti orchestrali
+# + Preservazione della dinamica musicale senza distorsioni
+# + Ideale per basso volume su soundbar LG Meridian SP7 + RPK8
+# ==============================================================================
+
+# Controllo argomenti
+INPUT_FILE="$1"
+OUTPUT_FILE="${INPUT_FILE%.*}_cartoon_ducked.mkv"
+BITRATE="384k"
+[ ! -z "$2" ] && BITRATE="$2"
+
+if [ -z "$INPUT_FILE" ]; then
+    echo "Uso: ./ducking_auto_cartoni.sh \"file.mkv\" [bitrate]"
+    exit 1
+fi
+
+# Analisi loudness LUFS e True Peak
+echo "==================== ANALISI LOUDNESS ===================="
+echo "Scansione del contenuto audio in corso..."
+echo "Misurazione EBU R128 integrated loudness..."
+echo "Rilevamento true peak e loudness range..."
+echo "L'analisi richiede circa 3-4 minuti..."
+
+ANALYSIS=$(ffmpeg -i "$INPUT_FILE" -af loudnorm=print_format=summary -f null - 2>&1)
+
+# Estrazione di TUTTI i valori disponibili
+LUFS=$(echo "$ANALYSIS" | grep "Input Integrated" | awk '{print $3}' | sed 's/LUFS//')
+PEAK=$(echo "$ANALYSIS" | grep "Input True Peak" | awk '{print $4}' | sed 's/dBTP//')
+LRA=$(echo "$ANALYSIS" | grep "Input LRA" | awk '{print $3}' | sed 's/LU//')
+THRESHOLD=$(echo "$ANALYSIS" | grep "Input Threshold" | awk '{print $3}' | sed 's/LUFS//')
+TARGET_OFFSET=$(echo "$ANALYSIS" | grep "Target Offset" | awk '{print $3}' | sed 's/LU//')
+
+echo "==================== RISULTATI ANALISI ===================="
+echo
+echo "LOUDNESS INTEGRATO (EBU R128):"
+echo "Input Integrated: $LUFS LUFS"
+if [ $(awk "BEGIN {print ($LUFS < -23) ? 1 : 0}") -eq 1 ]; then
+    echo "Valutazione: Audio sottodimensionato (molto conservativo)"
+elif [ $(awk "BEGIN {print ($LUFS > -16) ? 1 : 0}") -eq 1 ]; then
+    echo "Valutazione: Audio sovradimensionato (tipico di contenuti recenti)"
+else
+    echo "Valutazione: Livello loudness bilanciato per cartoni/musical"
+fi
+
+echo
+echo "TRUE PEAK ANALYSIS:"
+echo "Input True Peak: $PEAK dBTP"
+if [ $(awk "BEGIN {print ($PEAK > -1) ? 1 : 0}") -eq 1 ]; then
+    echo "ATTENZIONE: Picchi elevati - possibili saturazioni nelle sezioni musicali"
+elif [ $(awk "BEGIN {print ($PEAK > -3) ? 1 : 0}") -eq 1 ]; then
+    echo "Nota: Picchi moderati - headroom limitato per le parti orchestrali"
+else
+    echo "Picchi sicuri - headroom adeguato per processing"
+fi
+
+echo
+echo "DINAMICA E CARATTERISTICHE:"
+echo "Loudness Range: $LRA LU"
+if [ $(awk "BEGIN {print ($LRA < 7) ? 1 : 0}") -eq 1 ]; then
+    echo "Dinamica: Contenuto compresso (tipico cartoni moderni)"
+elif [ $(awk "BEGIN {print ($LRA > 12) ? 1 : 0}") -eq 1 ]; then
+    echo "Dinamica: Range ampio (tipico musical classici Disney)"
+else
+    echo "Dinamica: Range standard per animazione contemporanea"
+fi
+echo "Input Threshold: $THRESHOLD LUFS"
+echo "Target Offset: $TARGET_OFFSET LU"
+
+echo
+echo "RACCOMANDAZIONI AUTOMATICHE PER CARTONI/MUSICAL:"
+
+# Parametri base per cartoni animati e musical
+VOICE_BOOST=3.2
+LFE_REDUCTION=0.80
+LFE_DUCK_THRESHOLD=0.012
+LFE_DUCK_RATIO=3.5
+FX_DUCK_THRESHOLD=0.012
+FX_DUCK_RATIO=2.8
+FX_ATTACK=10
+FX_RELEASE=200
+LFE_ATTACK=15
+LFE_RELEASE=250
+LFE_HP_FREQ=45
+LFE_LP_FREQ=100
+LFE_CROSS_POLES=2
+
+# ============================================================================
+# ANALISI ADATTIVA E REGOLAZIONI (per cartoni e musical)
+# ============================================================================
+
+# Adattamento automatico in base a LUFS/Peak
+if [ $(awk "BEGIN {print ($LUFS < -20) ? 1 : 0}") -eq 1 ]; then
+    VOICE_BOOST=$(awk "BEGIN {print $VOICE_BOOST + 0.4}")
+    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.3}")
+    echo "APPLICATO: Boost voci (+0.4dB) per mix con audio debole"
+    echo "APPLICATO: Ducking leggermente aumentato (+0.3) per chiarezza"
+elif [ $(awk "BEGIN {print ($LUFS > -16) ? 1 : 0}") -eq 1 ]; then
+    VOICE_BOOST=$(awk "BEGIN {print $VOICE_BOOST - 0.2}")
+    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO - 0.2}")
+    echo "APPLICATO: Boost voci ridotto (-0.2dB) per audio già forte"
+    echo "APPLICATO: Ducking più leggero (-0.2) per preservare musica"
+else
+    echo "APPLICATO: Parametri standard - loudness nel range ottimale"
+fi
+
+# Regole adattive per LFE
+if [ $(awk "BEGIN {print ($PEAK > -2) ? 1 : 0}") -eq 1 ]; then
+    LFE_HP_FREQ=50
+    echo "APPLICATO: Taglio LFE aumentato (${LFE_HP_FREQ}Hz) per ridurre rischio saturazione"
+else
+    echo "APPLICATO: Taglio LFE standard (${LFE_HP_FREQ}Hz) per fondamenti orchestrali"
+fi
+
+# Rilevamento contenuti musical vs cartoni standard
+if [ $(awk "BEGIN {print ($LRA > 10) ? 1 : 0}") -eq 1 ]; then
+    # Per musical con ampia dinamica (es. classici Disney)
+    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO - 0.3}")
+    LFE_DUCK_RATIO=$(awk "BEGIN {print $LFE_DUCK_RATIO - 0.3}")
+    FX_RELEASE=$(awk "BEGIN {print $FX_RELEASE + 30}")
+    VOICE_EQ="highpass=f=80,equalizer=f=200:width_type=q:w=2.0:g=1.0,equalizer=f=1000:width_type=q:w=1.8:g=1.7,equalizer=f=4000:width_type=q:w=1.5:g=2.2"
+    SURROUND_BOOST=2.5
+    echo "APPLICATO: Profilo musical con preservazione dinamica orchestrale"
+    echo "APPLICATO: EQ specializzato per voci cantate con brillantezza acuta"
+elif [ $(awk "BEGIN {print ($LRA < 7 && $LUFS > -18) ? 1 : 0}") -eq 1 ]; then
+    # Per cartoni moderni con dinamica compressa
+    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.2}")
+    FX_DUCK_THRESHOLD=0.010
+    VOICE_EQ="highpass=f=80,equalizer=f=200:width_type=q:w=2.0:g=1.0,equalizer=f=1000:width_type=q:w=1.8:g=1.3,equalizer=f=3000:width_type=q:w=1.5:g=1.5"
+    SURROUND_BOOST=2.0
+    echo "APPLICATO: Profilo cartone moderno con bilanciamento voce/musica"
+else
+    # Per cartoni standard
+    VOICE_EQ="highpass=f=80,equalizer=f=200:width_type=q:w=2.0:g=1.0,equalizer=f=1000:width_type=q:w=1.8:g=1.5,equalizer=f=4000:width_type=q:w=1.5:g=2.0"
+    SURROUND_BOOST=2.2
+    echo "APPLICATO: Profilo cartone standard con buon bilanciamento generale"
+fi
+
+# EQ LFE per orchestrali e musical
+if [ $(awk "BEGIN {print ($LRA > 10) ? 1 : 0}") -eq 1 ]; then
+    # Per musical con orchestra prominente
+    LFE_EQ="equalizer=f=60:width_type=q:w=1.4:g=1.5,equalizer=f=100:width_type=q:w=1.6:g=0.7"
+    echo "APPLICATO: LFE orchestrale calibrato per sezioni d'archi e timpani"
+else
+    # Per cartoni standard
+    LFE_EQ="equalizer=f=60:width_type=q:w=1.4:g=1.3,equalizer=f=100:width_type=q:w=1.6:g=1.0"
+    echo "APPLICATO: LFE standard per cartoni animati"
+fi
+
+# Surround per ambientazione e musica
+SURROUND_EQ="equalizer=f=400:width_type=q:w=2.0:g=1.3,equalizer=f=2000:width_type=q:w=2.2:g=1.5,equalizer=f=7000:width_type=q:w=2.0:g=2.0"
+
+# Preparazione sidechain ottimizzata per musica
+COMPAND_PARAMS="attacks=0.01:decays=0.02:points=-60/-60|-30/-30|-15/-10:soft-knee=3:gain=0"
+SIDECHAIN_PREP="highpass=f=120,lowpass=f=5000,volume=2.5,compand=${COMPAND_PARAMS},agate=threshold=-35dB:ratio=1.5:attack=1:release=7000"
+
+# ============================================================================
+# RIORGANIZZAZIONE DEI FILTRI (dopo analisi adattiva e regole)
+# ============================================================================
+
+# 1. Filtro per il canale centrale (dialoghi e voci cantate)
+FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=0.99:limit=0.99"
+
+# 2. Filtro per il canale LFE
+LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=${LFE_CROSS_POLES},lowpass=f=${LFE_LP_FREQ}:poles=${LFE_CROSS_POLES},${LFE_EQ},volume=${LFE_REDUCTION}"
+
+# 3. Parametri per i compressori sidechain
+LFE_SC_PARAMS="threshold=${LFE_DUCK_THRESHOLD}:ratio=${LFE_DUCK_RATIO}:attack=${LFE_ATTACK}:release=${LFE_RELEASE}:makeup=1.0"
+FX_SC_PARAMS="threshold=${FX_DUCK_THRESHOLD}:ratio=${FX_DUCK_RATIO}:attack=${FX_ATTACK}:release=${FX_RELEASE}:makeup=1.0"
+
+# 4. Filtro finale per tutti i canali
+FINAL_FILTER="aresample=resampler=soxr:precision=28:cutoff=0.95:cheby=1,aformat=channel_layouts=5.1"
+
+echo
+echo "=========================================================="
+echo "Avvio elaborazione con parametri ottimizzati per cartoni/musical..."
+echo
+
+# Esecuzione processing con filtri riorganizzati
+start_time=$(date +%s)
+ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
+"[0:a]channelsplit=channel_layout=5.1[FL][FR][FC][LFE][SL][SR]; \
+[FC]${FC_FILTER}[FCboost]; \
+[FCboost]asplit[FCout][FCsc]; \
+[FCsc]${SIDECHAIN_PREP},aformat=channel_layouts=mono[FCsidechain]; \
+[LFE]${LFE_FILTER}[LFElow]; \
+[LFElow][FCsidechain]sidechaincompress=${LFE_SC_PARAMS}[LFEduck]; \
+[FL][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FL_comp]; \
+[FL_comp]volume=0.85[FLduck]; \
+[FR][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FR_comp]; \
+[FR_comp]volume=0.85[FRduck]; \
+[SL]volume=${SURROUND_BOOST},${SURROUND_EQ}[SLduck]; \
+[SR]volume=${SURROUND_BOOST},${SURROUND_EQ}[SRduck]; \
+[FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}" \
+-map 0:v -c:v copy \
+-c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice Cartoon 5.1" \
+-map 0:a -c:a:1 copy \
+-map 0:a:1? -c:a:2 copy -map 0:a:2? -c:a:3 copy -map 0:a:3? -c:a:4 copy \
+-map 0:s? -c:s copy \
+-map 0:t? -c:t copy \
+-disposition:a:0 default -disposition:a:1 0 \
+-map_metadata 0 \
+-map_chapters 0 \
+"$OUTPUT_FILE"
+
+# Controllo esito
+ffmpeg_exit_code=$?
+duration=$((($(date +%s) - start_time)))
+minuti=$((duration / 60))
+secondi=$((duration % 60))
+
+# Output finale
+if [ $ffmpeg_exit_code -eq 0 ]; then
+    echo
+    echo "==================== ELABORAZIONE COMPLETATA ===================="
+    echo "SUCCESSO - ${minuti}m ${secondi}s"
+    echo "Output: ${OUTPUT_FILE##*/}"
+    echo "Preset: Cartoon/Musical Ducking Auto (EAC3 ${BITRATE})"
+    echo
+    echo "PARAMETRI FINALI APPLICATI:"
+    echo "Voice Boost: $VOICE_BOOST dB"
+    echo "LFE Reduction: $LFE_REDUCTION"
+    echo "FX Duck Ratio: $FX_DUCK_RATIO:1"
+    echo "LFE Duck Ratio: $LFE_DUCK_RATIO:1"
+    echo "LFE HPF: $LFE_HP_FREQ Hz"
+    echo
+    echo "MISURAZIONE ORIGINALE:"
+    echo "LUFS: $LUFS | True Peak: $PEAK dBTP | LRA: $LRA LU"
+    echo "=================================================================="
+else
+    echo "ERRORE - ${minuti}m ${secondi}s"
+    exit 1
+fi
