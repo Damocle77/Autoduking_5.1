@@ -19,7 +19,7 @@ Tutti sfruttano analisi loudness avanzata (LUFS, True Peak, LRA), ducking intell
 | `ducking_auto_serie.sh` | Serie fantasy, sci-fi, horror | `*_serie_ducked.mkv` | EQ voce italiana, ducking adattivo, LFE cinematografico |
 *Daenerys e Jon discutono, draghi volano e fuoco ovunque, ma ogni parola arriva nitida come se fossi a Roccia del Drago.*
 
-## ⚙️ Requisiti "Armati come un Mandaloriano"
+## ⚙️ Requisiti - "Armati come un Mandaloriano"
 
 - **Bash** (Linux/macOS/WSL/Git Bash)
 - **FFmpeg** (>= 7.x, con E-AC3, SoxR, Filtercomplex, Audiograph)
