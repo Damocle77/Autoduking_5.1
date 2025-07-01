@@ -2,7 +2,7 @@
 
 > “Non serve essere Tony Stark per ottimizzare il mix: questi script sono il tuo Jarvis audio.”
 > “Se vuoi sentire la voce di Eleven anche quando il Demogorgone urla, qui trovi gli strumenti.”
-> “Dialoghi italiani chiari come il cristallo di Kyber, LFE controllato come il motore a curvatura della Voyager.”
+> “Dialoghi italiani chiari come un cristallo di Kyber, LFE controllato come il motore a curvatura della Voyager.”
 
 ## 💡 Cosa fanno questi script
 
@@ -37,7 +37,7 @@ winget install ffmpeg -e && install gitbash -e
 ```
 
 
-## 🚀 Come funziona (tecnico \& pop)
+## 🚀 Come funzionano
 
 ### Equalizzazione Voce Italiana
 
