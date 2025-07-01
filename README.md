@@ -69,7 +69,7 @@ brew install ffmpeg
 - Il resampling soxr è la “pietra filosofale” del processing: mantiene intatti i dettagli, elimina artefatti digitali, e garantisce compatibilità perfetta con qualsiasi player.
 
 
-## 🧑‍🚀 Perché usarli - "Perchè anche tu sei un Nerd!"
+## 🧑‍🚀 Perché usarli - "Perchè sei un Nerd!"
 
 - Analisi loudness automatica, come avere un Data che ti monitora il segnale in tempo reale.
 - Dialoghi italiani sempre chiari, anche quando il mix originale sembra uscito da una battaglia su Mustafar.
