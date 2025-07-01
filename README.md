@@ -41,7 +41,7 @@ brew install ffmpeg
 ```
 
 
-## 🚀 Come funzionano - “Sintonizza il deflettore e lancia gli script"
+## 🚀 Come funzionano - “Sintonizza il deflettore"
 
 ### Equalizzazione voce italiana
 
