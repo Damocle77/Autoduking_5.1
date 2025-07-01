@@ -17,7 +17,7 @@ Tutti sfruttano analisi loudness avanzata (LUFS, True Peak, LRA), ducking intell
 | `ducking_auto_film.sh` | Film d’azione, thriller, horror | `*_film_ducked.mkv` | EQ voce italiana, ducking dinamico, LFE anti-scoppio |
 *Dialoghi italiani in primo piano, bassi profondi ma mai invadenti, ducking da sala IMAX anche se Godzilla e Kong si affrontano.*
 | `ducking_auto_serie.sh` | Serie fantasy, sci-fi, horror | `*_serie_ducked.mkv` | EQ voce italiana, ducking adattivo, LFE cinematografico |
-*Daenerys e Targaryen discutono, draghi volano e fuoco ovunque, ma ogni parola arriva nitida come se fossi a Roccia del Drago.*
+*Daenerys e Jon discutono, draghi volano e fuoco ovunque, ma ogni parola arriva nitida come se fossi a Roccia del Drago.*
 
 ## ⚙️ Requisiti
 
@@ -33,10 +33,11 @@ cd autoducking_5.1
 chmod +x ducking_auto_*.sh
 ```
 
-Su Windows:
-
 ```bash
-winget install ffmpeg -e && install gitbash -e
+winget install ffmpeg -e && winget install Git.Git -e
+sudo apt install ffmpeg
+sudo dnf install ffmpeg
+brew install ffmpeg
 ```
 
 
@@ -45,26 +46,26 @@ winget install ffmpeg -e && install gitbash -e
 ### Equalizzazione voce italiana
 
 - **Filtro centrale** ottimizzato tra 200 e 3500Hz, con highpass tra 60 e 80Hz: così ogni “Che c’è?” si sente anche se Godzilla pesta i piedi.
-- Il boost sulle medie frequenze è adattivo: nei mix compressi (cartoni moderni, action rumorosi) la voce viene spinta in avanti, nei musical classici si preserva la dinamica naturale[^1][^2][^3].
+- Il boost sulle medie frequenze è adattivo: nei mix compressi (cartoni moderni, action rumorosi) la voce viene spinta in avanti, nei musical classici si preserva la dinamica naturale.
 - L’equalizzazione è pensata per il timbro italiano: niente voci nasali o sibilanti, solo chiarezza e presenza, come se stessi ascoltando un doppiaggio da Oscar.
 
 
 ### Ducking Dinamico in tempo reale
 
-- **Sidechain**: quando la voce parla, effetti e LFE si abbassano in tempo reale, stile “scudo deflettore” di Star Trek che si attiva solo quando serve[^1][^2][^3].
+- **Sidechain**: quando la voce parla, effetti e LFE si abbassano in tempo reale, stile “scudo deflettore” di Star Trek che si attiva solo quando serve.
 - I parametri di attack/release sono adattivi: nei musical e cartoni il ducking è più morbido, nei film e serie più aggressivi è più deciso, così il dialogo resta sempre in primo piano senza snaturare il mix.
 
 
 ### LFE arioso, controllato ed equalizzato
 
 - **LFE** mai “scoppiettante”: taglio passa-alto (30-50Hz), lowpass (100-120Hz), equalizzazione selettiva per evitare saturazioni e distorsioni anche su subwoofer modesti.
-- Nei musical, il LFE viene reso più “arioso” per non coprire archi e voci; nei film d’azione, la protezione anti-scoppio entra in gioco come un campo di forza di Wakanda[^1][^2][^3].
+- Nei musical, il LFE viene reso più “arioso” per non coprire archi e voci; nei film d’azione, la protezione anti-scoppio entra in gioco come un campo di forza di Wakanda.
 - Il boost sui bassi viene ridotto automaticamente in presenza di mix troppo dinamici o con picchi elevati.
 
 
 ### Ricampionamento SoxR
 
-- Tutto l’audio viene passato attraverso **SoxR** con precisione 28 bit, cutoff 0.95, filtro chebyshev: aliasing sotto controllo, qualità da sala IMAX anche se ascolti su una soundbar entry-level[^1][^2][^3].
+- Tutto l’audio viene passato attraverso **SoxR** con precisione 28 bit, cutoff 0.95, filtro chebyshev: aliasing sotto controllo, qualità da sala IMAX anche se ascolti su una soundbar entry-level.
 - Il resampling soxr è la “pietra filosofale” del processing: mantiene intatti i dettagli, elimina artefatti digitali, e garantisce compatibilità perfetta con qualsiasi player.
 
 
