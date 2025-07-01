@@ -25,7 +25,7 @@ Tutti sfruttano analisi loudness avanzata (LUFS, True Peak, LRA), ducking intell
 - **FFmpeg** (>= 7.x, con E-AC3, SoxR, Filtercomplex, Audiograph)
 
 
-## 📥 Installazione - “Energizza ed installa in 30 secondi”
+## 📥 Installazione in 30 secondi - “Energizza”
 
 ```bash
 git clone https://github.com/Damocle77/Autoduking_5.1.git
