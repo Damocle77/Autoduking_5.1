@@ -4,7 +4,7 @@
 > “Se vuoi sentire la voce di Bulma anche quando il Vegeta urla, qui trovi gli strumenti adatti!”
 > “Dialoghi italiani chiari come un cristallo di Kyber, LFE controllato come il motore a curvatura della Voyager.”
 
-## 💡 Cosa fanno questi script - “Usa tuo scudo di vibranio contro il caos sonoro”
+## 💡 Cosa fanno questi script - “Usa tuo scudo di vibranio”
 
 Tre preset Bash, ognuno pensato per un diverso scenario multicanale 5.1.
 Tutti sfruttano analisi loudness avanzata (LUFS, True Peak, LRA), ducking intelligente e filtri di equalizzazione specifici per la lingua italiana, con un occhio di riguardo a LFE e surround. Il tutto, ricampionato via soxr per una qualità da laboratorio SHIELD...questa è la via!
