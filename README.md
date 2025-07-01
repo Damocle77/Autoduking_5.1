@@ -1,10 +1,10 @@
-# 🎛️ Autoducking 5.1
+# 🎛️ Autoducking 5.1 "Tuffati nel suono"
 
 > “Non serve essere Tony Stark per ottimizzare il mix: questi script sono già il tuo Jarvis audio.”
 > “Se vuoi sentire la voce di Bulma anche quando il Vegeta urla, qui trovi gli strumenti adatti!”
 > “Dialoghi italiani chiari come un cristallo di Kyber, LFE controllato come il motore a curvatura della Voyager.”
 
-## 💡 Cosa fanno questi script
+## 💡 Cosa fanno questi script “Attiva la navetta e scegli il tuo preset”
 
 Tre preset Bash, ognuno pensato per un diverso scenario multicanale 5.1.
 Tutti sfruttano analisi loudness avanzata (LUFS, True Peak, LRA), ducking intelligente e filtri di equalizzazione specifici per la lingua italiana, con un occhio di riguardo a LFE e surround. Il tutto, ricampionato via soxr per una qualità da laboratorio SHIELD...questa è la via!
@@ -19,13 +19,13 @@ Tutti sfruttano analisi loudness avanzata (LUFS, True Peak, LRA), ducking intell
 | `ducking_auto_serie.sh` | Serie fantasy, sci-fi, horror | `*_serie_ducked.mkv` | EQ voce italiana, ducking adattivo, LFE cinematografico |
 *Daenerys e Jon discutono, draghi volano e fuoco ovunque, ma ogni parola arriva nitida come se fossi a Roccia del Drago.*
 
-## ⚙️ Requisiti
+## ⚙️ Requisiti "Armati come un Mandaloriano"
 
 - **Bash** (Linux/macOS/WSL/Git Bash)
 - **FFmpeg** (>= 7.x, con E-AC3, SoxR, Filtercomplex, Audiograph)
 
 
-## 📥 Installazione
+## 📥 Installazione “Energizza ed installa in 30 secondi”
 
 ```bash
 git clone https://github.com/Damocle77/Autoduking_5.1.git
@@ -41,7 +41,7 @@ brew install ffmpeg
 ```
 
 
-## 🚀 Come funzionano
+## 🚀 Come funzionano “Sintonizza il deflettore e lancia gli script"
 
 ### Equalizzazione voce italiana
 
@@ -65,15 +65,15 @@ brew install ffmpeg
 
 ### Ricampionamento SoxR
 
-- Tutto l’audio viene passato attraverso **SoxR** con precisione 28 bit, cutoff 0.95, filtro chebyshev: aliasing sotto controllo, qualità da sala IMAX anche se ascolti su una soundbar entry-level.
+- Tutto l’audio viene passato attraverso **SoxR** con precisione 28 bit, cutoff 0.95, filtro chebyshev: aliasing sotto controllo, qualità da sala IMAX anche se usi un AVR entry-level.
 - Il resampling soxr è la “pietra filosofale” del processing: mantiene intatti i dettagli, elimina artefatti digitali, e garantisce compatibilità perfetta con qualsiasi player.
 
 
-## 🧑‍🚀 Perché usarli
+## 🧑‍🚀 Perché usarli "Perchè anche tu sei un Nerd!"
 
 - Analisi loudness automatica, come avere un Data che ti monitora il segnale in tempo reale.
 - Dialoghi italiani sempre chiari, anche quando il mix originale sembra uscito da una battaglia su Mustafar.
 - Ducking e LFE ottimizzati per ogni scenario: nessun effetto speciale o basso fuori controllo ti farà più perdere una battuta.
 - Ricampionamento soxr: la differenza tra un teletrasporto e una navetta vecchia scuola.
 
-> “Non serve la Forza. Servono solo un terminale e questi script.”
+> “Per riportare equilibrio nella Forza. Servono solo un terminale e questi script.”
