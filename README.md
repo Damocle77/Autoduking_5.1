@@ -76,4 +76,4 @@ brew install ffmpeg
 - Ducking e LFE ottimizzati per ogni scenario: nessun effetto speciale o basso fuori controllo ti farà più perdere una battuta.
 - Ricampionamento soxr: la differenza tra un teletrasporto e una navetta vecchia scuola.
 
-> “Per riportare equilibrio nella Forza servono solo un terminale e questi script.”
+>  “Per riportare equilibrio nella Forza ti servono solo un terminale e questi script.”
