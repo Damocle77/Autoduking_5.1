@@ -34,14 +34,31 @@ if [ -z "$INPUT_FILE" ]; then
     exit 1
 fi
 
-# Analisi loudness LUFS e True Peak
+# Analisi loudness LUFS e True Peak  con spin indicator
 echo "==================== ANALISI LOUDNESS ===================="
-echo "Scansione del contenuto audio in corso..."
-echo "Misurazione EBU R128 integrated loudness..."
-echo "Rilevamento true peak e loudness range..."
-echo "L'analisi richiede circa 3-4 minuti..."
+echo "Avvio array di sensori... Calibrazione del flusso audio in corso."
+echo "Acquisizione telemetria EBU R128: calcolo del Loudness Integrato."
+echo "Scansione subspaziale per True Peak e Loudness Range (LRA)."
+echo "ETA per la decodifica del segnale: circa 10 min per ora di runtime."
+
+# Spin indicator elegante
+spin_chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+{
+    while true; do
+        for (( i=0; i<${#spin_chars}; i++ )); do
+            printf "\rScansione: %s " "${spin_chars:$i:1}"
+            sleep 0.1
+        done
+    done
+} &
+SPIN_PID=$!
 
 ANALYSIS=$(ffmpeg -i "$INPUT_FILE" -af loudnorm=print_format=summary -f null - 2>&1)
+
+# Termina lo spin e pulisci la riga
+kill $SPIN_PID 2>/dev/null
+wait $SPIN_PID 2>/dev/null
+printf "\rAnalisi completata!                    \n"
 
 # Estrazione di TUTTI i valori disponibili
 LUFS=$(echo "$ANALYSIS" | grep "Input Integrated" | awk '{print $3}' | sed 's/LUFS//')
@@ -55,33 +72,33 @@ echo
 echo "LOUDNESS INTEGRATO (EBU R128):"
 echo "Input Integrated: $LUFS LUFS"
 if [ $(awk "BEGIN {print ($LUFS < -23) ? 1 : 0}") -eq 1 ]; then
-    echo "Valutazione: Audio sottodimensionato (molto conservativo)"
+    echo "Profilo Loudness: Mix delicato, da classico d'annata. Necessita di più energia."
 elif [ $(awk "BEGIN {print ($LUFS > -16) ? 1 : 0}") -eq 1 ]; then
-    echo "Valutazione: Audio sovradimensionato (tipico di contenuti recenti)"
+    echo "Profilo Loudness: Mix moderno e potente, tipico delle produzioni attuali."
 else
-    echo "Valutazione: Livello loudness bilanciato per cartoni/musical"
+    echo "Profilo Loudness: Bilanciato. L'orchestra è pronta a suonare."
 fi
 
 echo
 echo "TRUE PEAK ANALYSIS:"
 echo "Input True Peak: $PEAK dBTP"
 if [ $(awk "BEGIN {print ($PEAK > -1) ? 1 : 0}") -eq 1 ]; then
-    echo "ATTENZIONE: Picchi elevati - possibili saturazioni nelle sezioni musicali"
+    echo "ATTENZIONE: L'orchestra sta suonando forte! Rischio di saturazione armonica nei crescendo."
 elif [ $(awk "BEGIN {print ($PEAK > -3) ? 1 : 0}") -eq 1 ]; then
-    echo "Nota: Picchi moderati - headroom limitato per le parti orchestrali"
+    echo "Nota: Headroom limitato. I timpani stanno sfiorando il limite."
 else
-    echo "Picchi sicuri - headroom adeguato per processing"
+    echo "Condizione Verde: Palco sonoro pulito. C'è spazio per ogni strumento."
 fi
 
 echo
 echo "DINAMICA E CARATTERISTICHE:"
 echo "Loudness Range: $LRA LU"
 if [ $(awk "BEGIN {print ($LRA < 7) ? 1 : 0}") -eq 1 ]; then
-    echo "Dinamica: Contenuto compresso (tipico cartoni moderni)"
+    echo "Profilo Dinamico: Compresso. Pensato per un ascolto facile e immediato."
 elif [ $(awk "BEGIN {print ($LRA > 12) ? 1 : 0}") -eq 1 ]; then
-    echo "Dinamica: Range ampio (tipico musical classici Disney)"
+    echo "Profilo Dinamico: Ampio, da classico musical Disney. Prepararsi a numeri cantati epici."
 else
-    echo "Dinamica: Range standard per animazione contemporanea"
+    echo "Profilo Dinamico: Standard Pixar/Dreamworks. Un buon equilibrio tra dialogo e azione."
 fi
 echo "Input Threshold: $THRESHOLD LUFS"
 echo "Target Offset: $TARGET_OFFSET LU"
@@ -90,11 +107,12 @@ echo
 echo "RACCOMANDAZIONI AUTOMATICHE PER CARTONI/MUSICAL:"
 
 # Parametri base per cartoni animati e musical
-VOICE_BOOST=3.2
-LFE_REDUCTION=0.78
+VOICE_BOOST=3.4
+LFE_REDUCTION=0.77
 LFE_DUCK_THRESHOLD=0.012
 LFE_DUCK_RATIO=3.5
 FX_DUCK_THRESHOLD=0.012
+FRONT_FX_REDUCTION=0.92
 FX_DUCK_RATIO=2.8
 FX_ATTACK=40
 FX_RELEASE=700
@@ -126,7 +144,7 @@ fi
 # Regole adattive per LFE
 if [ $(awk "BEGIN {print ($PEAK > -2) ? 1 : 0}") -eq 1 ]; then
     LFE_HP_FREQ=50
-    echo "APPLICATO: Taglio LFE aumentato (${LFE_HP_FREQ}Hz) per ridurre rischio saturazione"
+    echo "ATTIVO: Filtro 'Anti-Fango' potenziato a ${LFE_HP_FREQ}Hz. Preservata la musicalità, rimosso il rimbombo."
 else
     echo "APPLICATO: Taglio LFE standard (${LFE_HP_FREQ}Hz) per fondamenti orchestrali"
 fi
@@ -136,7 +154,7 @@ VOICE_EQ="highpass=f=80,equalizer=f=200:width_type=q:w=2.0:g=1.0,equalizer=f=100
 
 # EQ LFE per orchestrali e musical
 LFE_EQ="equalizer=f=35:width_type=q:w=1.6:g=0.6,equalizer=f=75:width_type=q:w=1.8:g=0.4"
-echo "APPLICATO: LFE orchestrale arioso calibrato per definizione e musicalità"
+echo "ATTIVO: Equalizzazione orchestrale. I bassi sono ora più definiti e musicali, non solo 'boom'."
 
 # Surround per ambientazione e musica
 SURROUND_EQ="equalizer=f=400:width_type=q:w=2.0:g=1.3,equalizer=f=2000:width_type=q:w=2.2:g=1.5,equalizer=f=7000:width_type=q:w=2.0:g=2.0"
@@ -144,6 +162,9 @@ SURROUND_EQ="equalizer=f=400:width_type=q:w=2.0:g=1.3,equalizer=f=2000:width_typ
 # Preparazione sidechain ottimizzata per musica
 COMPAND_PARAMS="attacks=0.01:decays=0.02:points=-60/-60|-30/-30|-15/-10:soft-knee=3:gain=0"
 SIDECHAIN_PREP="highpass=f=120,lowpass=f=5000,volume=2.5,compand=${COMPAND_PARAMS},agate=threshold=-35dB:ratio=1.5:attack=1:release=7000"
+
+# EQ Front FX per pulizia e definizione
+FRONT_FX_EQ="highpass=f=90"
 
 # ============================================================================
 # RIORGANIZZAZIONE DEI FILTRI (dopo analisi adattiva e regole)
@@ -176,10 +197,12 @@ ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
 [FCsc]${SIDECHAIN_PREP},aformat=channel_layouts=mono[FCsidechain]; \
 [LFE]${LFE_FILTER}[LFElow]; \
 [LFElow][FCsidechain]sidechaincompress=${LFE_SC_PARAMS}[LFEduck]; \
-[FL][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FL_comp]; \
-[FL_comp]volume=0.92[FLduck]; \
-[FR][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FR_comp]; \
-[FR_comp]volume=0.92[FRduck]; \
+[FL]${FRONT_FX_EQ}[FL_eq]; \
+[FL_eq][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FL_comp]; \
+[FL_comp]volume=${FRONT_FX_REDUCTION}[FLduck]; \
+[FR]${FRONT_FX_EQ}[FR_eq]; \
+[FR_eq][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FR_comp]; \
+[FR_comp]volume=${FRONT_FX_REDUCTION}[FRduck]; \
 [SL]volume=1.6,${SURROUND_EQ}[SLduck]; \
 [SR]volume=1.6,${SURROUND_EQ}[SRduck]; \
 [FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}" \

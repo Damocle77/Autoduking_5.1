@@ -36,10 +36,10 @@ fi
 
 # Analisi loudness LUFS e True Peak con spin indicator
 echo "==================== ANALISI LOUDNESS ===================="
-echo "Scansione del contenuto audio in corso..."
-echo "Misurazione EBU R128 integrated loudness..."
-echo "Rilevamento true peak e loudness range..."
-echo "L'analisi richiede circa 3-4 minuti per episodio..."
+echo "Avvio array di sensori... Calibrazione del flusso audio in corso."
+echo "Acquisizione telemetria EBU R128: calcolo del Loudness Integrato."
+echo "Scansione subspaziale per True Peak e Loudness Range (LRA)."
+echo "ETA per la decodifica del segnale: circa 10 min per ora di runtime."
 
 # Spin indicator elegante
 spin_chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
@@ -94,11 +94,11 @@ echo
 echo "DINAMICA E SOGLIE:"
 echo "Loudness Range: $LRA LU"
 if [ $(awk "BEGIN {print ($LRA < 5) ? 1 : 0}") -eq 1 ]; then
-    echo "Dinamica: Contenuto altamente compresso (tipico serie TV moderna)"
+    echo "Profilo Dinamico: Compresso, ottimizzato per lo streaming veloce. Poca escursione."
 elif [ $(awk "BEGIN {print ($LRA > 12) ? 1 : 0}") -eq 1 ]; then
-    echo "Dinamica: Range elevato (tipico serie fantasy/sci-fi premium)"
+    echo "Profilo Dinamico: Ampio, space opera o epic. Dialoghi sussurrati ed esplosioni garantite."
 else
-    echo "Dinamica: Range standard per serie televisive"
+    echo "Profilo Dinamico: Standard televisivo. Pronto per il prossimo episodio."
 fi
 echo "Input Threshold: $THRESHOLD LUFS"
 echo "Target Offset: $TARGET_OFFSET LU"
@@ -108,13 +108,14 @@ echo "RACCOMANDAZIONI AUTOMATICHE SERIE TV:"
 
 # Parametri base (preset serie genere)
 VOICE_BOOST=3.6
-LFE_REDUCTION=0.74
+LFE_REDUCTION=0.75
 LFE_DUCK_THRESHOLD=0.006
 LFE_DUCK_RATIO=3.5
 FX_DUCK_THRESHOLD=0.009
 FX_DUCK_RATIO=2.5
 FX_ATTACK=15
 FX_RELEASE=300
+FRONT_FX_REDUCTION=0.9
 LFE_ATTACK=20
 LFE_RELEASE=350
 LFE_HP_FREQ=35
@@ -135,8 +136,11 @@ if [ $(awk "BEGIN {print ($LUFS < -20) ? 1 : 0}") -eq 1 ]; then
 elif [ $(awk "BEGIN {print ($LUFS > -16) ? 1 : 0}") -eq 1 ]; then
     VOICE_BOOST=$(awk "BEGIN {print $VOICE_BOOST - 0.2}")
     LFE_REDUCTION=$(awk "BEGIN {print $LFE_REDUCTION - 0.07}")
+    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.5}")
+    LFE_DUCK_RATIO=$(awk "BEGIN {print $LFE_DUCK_RATIO + 0.5}")
     echo "APPLICATO: Riduzione boost dialogo (-0.2dB) per audio già forte"
     echo "APPLICATO: LFE più ridotto (-0.07) per bilanciare il mix"
+    echo "APPLICATO: Ducking rinforzato per mix ultra-compresso"
 else
     echo "APPLICATO: Parametri standard - loudness nel range ottimale"
 fi
@@ -154,7 +158,7 @@ if [ $(awk "BEGIN {print ($LRA < 5 && $LUFS > -18) ? 1 : 0}") -eq 1 ]; then
     # Per serie con dialogo continuo e dinamica compressa 
     FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.6}")
     FX_RELEASE=$(awk "BEGIN {print $FX_RELEASE - 25}")
-    echo "APPLICATO: Protezione anti-affaticamento per serie con dialogo continuo"
+    echo "ATTIVO: Protocollo 'Maratona Binge-Watching'. Ducking ottimizzato per dialoghi continui."
     echo "APPLICATO: Rilascio ducking più rapido per transizioni fluide"
 fi
 
@@ -175,12 +179,18 @@ echo "APPLICATO: LFE cinematografico arioso per definizione e impatto"
 if [ $(awk "BEGIN {print ($PEAK > -1.5 && $LRA > 12) ? 1 : 0}") -eq 1 ]; then
     # Mix con picchi molto alti E ampia dinamica: rischio "scoppio" LFE
     LFE_REDUCTION=$(awk "BEGIN {print $LFE_REDUCTION - 0.12}")
-    echo "APPLICATO: Protezione anti-scoppio LFE per serie con picchi elevati"
+    echo "ATTIVO: Scudi Deflettori alzati! Protezione LFE per picchi da battaglia spaziale."
 fi
 
 # Preparazione sidechain (più vicina al preset film per migliore equilibrio)
 COMPAND_PARAMS="attacks=0.02:decays=0.05:points=-60/-60|-25/-25|-12/-8:soft-knee=2:gain=0"
 SIDECHAIN_PREP="highpass=f=110,lowpass=f=4000,volume=3.0,compand=${COMPAND_PARAMS},agate=threshold=-38dB:ratio=1.8:attack=2:release=5500"
+
+# Filtri surround per serie TV
+SURROUND_EQ="equalizer=f=180:width_type=q:w=1.8:g=1.1,equalizer=f=2500:width_type=q:w=2.0:g=1.4"
+
+# EQ Front FX per pulizia e definizione
+FRONT_FX_EQ="highpass=f=90"
 
 # ============================================================================
 # RIORGANIZZAZIONE DEI FILTRI (dopo analisi adattiva e regole)
@@ -213,12 +223,14 @@ ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
 [FCsc]${SIDECHAIN_PREP},aformat=channel_layouts=mono[FCsidechain]; \
 [LFE]${LFE_FILTER}[LFElow]; \
 [LFElow][FCsidechain]sidechaincompress=${LFE_SC_PARAMS}[LFEduck]; \
-[FL][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FL_comp]; \
-[FL_comp]volume=0.9[FLduck]; \
-[FR][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FR_comp]; \
-[FR_comp]volume=0.9[FRduck]; \
-[SL]volume=1.8[SLduck]; \
-[SR]volume=1.8[SRduck]; \
+[FL]${FRONT_FX_EQ}[FL_eq]; \
+[FL_eq][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FL_comp]; \
+[FL_comp]volume=${FRONT_FX_REDUCTION}[FLduck]; \
+[FR]${FRONT_FX_EQ}[FR_eq]; \
+[FR_eq][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FR_comp]; \
+[FR_comp]volume=${FRONT_FX_REDUCTION}[FRduck]; \
+[SL]volume=1.8,${SURROUND_EQ}[SLduck]; \
+[SR]volume=1.8,${SURROUND_EQ}[SRduck]; \
 [FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}" \
 -map 0:v -c:v copy \
 -c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice Serie 5.1" \

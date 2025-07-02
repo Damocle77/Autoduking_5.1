@@ -36,10 +36,10 @@ fi
 
 # Analisi loudness LUFS e True Peak con spin indicator
 echo "==================== ANALISI LOUDNESS ===================="
-echo "Scansione del contenuto audio in corso..."
-echo "Misurazione EBU R128 integrated loudness..."
-echo "Rilevamento true peak e loudness range..."
-echo "L'analisi richiede circa 20 minuti per 2h di video..."
+echo "Avvio array di sensori... Calibrazione del flusso audio in corso."
+echo "Acquisizione telemetria EBU R128: calcolo del Loudness Integrato."
+echo "Scansione subspaziale per True Peak e Loudness Range (LRA)."
+echo "ETA per la decodifica del segnale: circa 10 min per ora di runtime."
 
 # Spin indicator elegante
 spin_chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
@@ -72,33 +72,33 @@ echo
 echo "LOUDNESS INTEGRATO (EBU R128):"
 echo "Input Integrated: $LUFS LUFS"
 if [ $(awk "BEGIN {print ($LUFS < -23) ? 1 : 0}") -eq 1 ]; then
-    echo "Valutazione: Audio sottodimensionato (broadcast standard: -23 LUFS)"
+    echo "Profilo Loudness: Mix conservativo, sotto gli standard di streaming."
 elif [ $(awk "BEGIN {print ($LUFS > -16) ? 1 : 0}") -eq 1 ]; then
-    echo "Valutazione: Audio sovradimensionato (streaming standard: -16 LUFS)"
+    echo "Profilo Loudness: Mix 'caldo', al limite dei protocolli di streaming (-16 LUFS)."
 else
-    echo "Valutazione: Livello loudness accettabile per contenuto cinematografico"
+    echo "Profilo Loudness: Bilanciato. Entro le specifiche cinematografiche."
 fi
 
 echo
 echo "TRUE PEAK ANALYSIS:"
 echo "Input True Peak: $PEAK dBTP"
 if [ $(awk "BEGIN {print ($PEAK > -1) ? 1 : 0}") -eq 1 ]; then
-    echo "ATTENZIONE: Picchi elevati - rischio clipping su codec lossy"
+    echo "ALLARME ROSSO: Headroom esaurito. Rischio di clipping imminente su codec lossy."
 elif [ $(awk "BEGIN {print ($PEAK > -3) ? 1 : 0}") -eq 1 ]; then
-    echo "Nota: Picchi moderati - headroom limitato"
+    echo "Allerta Gialla: Headroom limitato. Lo spazio di manovra di un X-Wing nella Morte Nera."
 else
-    echo "Picchi conservativi - mix cinematografico tradizionale"
+    echo "Condizione Verde: Headroom ottimale. Spazio di manovra abbondante."
 fi
 
 echo
 echo "DINAMICA E CARATTERISTICHE FILMICHE:"
 echo "Loudness Range: $LRA LU"
 if [ $(awk "BEGIN {print ($LRA < 6) ? 1 : 0}") -eq 1 ]; then
-    echo "Dinamica: Film altamente compresso (action moderno)"
+    echo "Profilo Dinamico: Compressione elevata, stile 'Michael Bay'. Bum Bum Bay."
 elif [ $(awk "BEGIN {print ($LRA > 20) ? 1 : 0}") -eq 1 ]; then
-    echo "Dinamica: Film molto dinamico (drammatico/classico)"
+    echo "Profilo Dinamico: Ampio, da film d'autore o alla 'Nolan'. Silenzi e esplosioni."
 else
-    echo "Dinamica: Range cinematografico standard"
+    echo "Profilo Dinamico: Standard cinematografico. Un mix ben educato."
 fi
 echo "Input Threshold: $THRESHOLD LUFS"
 echo "Target Offset: $TARGET_OFFSET LU"
@@ -112,6 +112,8 @@ LFE_REDUCTION=0.74
 LFE_DUCK_THRESHOLD=0.005
 LFE_DUCK_RATIO=3.5
 FX_DUCK_RATIO=2.5
+FX_DUCK_THRESHOLD=0.009
+FRONT_FX_REDUCTION=0.9
 FX_ATTACK=15
 FX_RELEASE=300
 LFE_ATTACK=20
@@ -127,7 +129,7 @@ if [ $(awk "BEGIN {print ($LUFS > -14) ? 1 : 0}") -eq 1 ]; then
     LFE_DUCK_RATIO=$(awk "BEGIN {print $LFE_DUCK_RATIO + 0.8}")
     FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.5}")
     LFE_REDUCTION=$(awk "BEGIN {print $LFE_REDUCTION - 0.1}")
-    echo "APPLICATO: Mix aggressivo - ducking RINFORZATO per bilanciare"
+    echo "ATTIVO: Protocollo 'Mix Aggressivo'. Potenziati i campi di contenimento (ducking)."
     echo "APPLICATO: LFE/FX più controllati per mix equilibrato"
 elif [ $(awk "BEGIN {print ($LUFS < -20) ? 1 : 0}") -eq 1 ]; then
     VOICE_BOOST=$(awk "BEGIN {print $VOICE_BOOST + 0.4}")
@@ -148,10 +150,10 @@ else
 fi
 
 # Controllo correlato al True Peak e LRA per LFE
-if [ $(awk "BEGIN {print ($PEAK > -1.5 && $LRA > 15) ? 1 : 0}") -eq 1 ]; then
+if [ $(awk "BEGIN {print ($PEAK > -1.5 && $LRA > 13) ? 1 : 0}") -eq 1 ]; then
     # Mix con picchi molto alti E ampia dinamica: rischio "scoppio" LFE
     LFE_REDUCTION=$(awk "BEGIN {print $LFE_REDUCTION - 0.15}")
-    echo "APPLICATO: Protezione anti-scoppio LFE per mix con picchi elevati e ampia dinamica"
+    echo "ENGAGE: Protocollo Anti-Detonazione LFE. Domati i sub-bassi per evitare danni strutturali."
 fi
 
 # Regole adattive per EQ voce
@@ -178,8 +180,11 @@ SIDECHAIN_PREP="highpass=f=100,lowpass=f=4000,volume=3.0,compand=${COMPAND_PARAM
 # EQ LFE cinematografico (se non già definito dalla protezione anti-scoppio)
 LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=65:width_type=q:w=1.8:g=0.4"
 
-# Filtri surround
+# Surround EQ per film d'azione e thriller
 SURROUND_EQ="equalizer=f=180:width_type=q:w=1.8:g=1.1,equalizer=f=2500:width_type=q:w=2.0:g=1.4"
+
+# EQ Front FX per pulizia e definizione
+FRONT_FX_EQ="highpass=f=90"
 
 # ============================================================================
 # RIORGANIZZAZIONE DEI FILTRI (dopo analisi adattiva e regole)
@@ -193,7 +198,8 @@ LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=120:poles=2,${LFE_EQ},vo
 
 # 3. Parametri per i compressori sidechain
 LFE_SC_PARAMS="threshold=${LFE_DUCK_THRESHOLD}:ratio=${LFE_DUCK_RATIO}:attack=${LFE_ATTACK}:release=${LFE_RELEASE}:makeup=1.0"
-FX_SC_PARAMS="threshold=0.009:ratio=${FX_DUCK_RATIO}:attack=${FX_ATTACK}:release=${FX_RELEASE}:makeup=1.0"
+FX_SC_PARAMS="threshold=${FX_DUCK_THRESHOLD}:ratio=${FX_DUCK_RATIO}:attack=${FX_ATTACK}:release=${FX_RELEASE}:makeup=1.0"
+
 
 # 4. Filtro finale per tutti i canali
 FINAL_FILTER="aresample=resampler=soxr:precision=28:cutoff=0.95:cheby=1,aformat=channel_layouts=5.1"
@@ -212,10 +218,12 @@ ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
 [FCsc]${SIDECHAIN_PREP},aformat=channel_layouts=mono[FCsidechain]; \
 [LFE]${LFE_FILTER}[LFElow]; \
 [LFElow][FCsidechain]sidechaincompress=${LFE_SC_PARAMS}[LFEduck]; \
-[FL][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FL_comp]; \
-[FL_comp]volume=0.9[FLduck]; \
-[FR][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FR_comp]; \
-[FR_comp]volume=0.9[FRduck]; \
+[FL]${FRONT_FX_EQ}[FL_eq]; \
+[FL_eq][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FL_comp]; \
+[FL_comp]volume=${FRONT_FX_REDUCTION}[FLduck]; \
+[FR]${FRONT_FX_EQ}[FR_eq]; \
+[FR_eq][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FR_comp]; \
+[FR_comp]volume=${FRONT_FX_REDUCTION}[FRduck]; \
 [SL]volume=1.8,${SURROUND_EQ}[SLduck]; \
 [SR]volume=1.8,${SURROUND_EQ}[SRduck]; \
 [FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}" \
