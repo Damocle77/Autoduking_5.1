@@ -42,15 +42,17 @@ echo "Scansione subspaziale per True Peak e Loudness Range (LRA)."
 echo "ETA per la decodifica del segnale: circa 10 min per ora di runtime."
 
 # Spin indicator elegante
-spin_chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
-{
+show_spinner() {
+    spin_chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
     while true; do
         for (( i=0; i<${#spin_chars}; i++ )); do
             printf "\rScansione: %s " "${spin_chars:$i:1}"
             sleep 0.1
         done
     done
-} &
+}
+# Avvia lo spinner in background
+show_spinner &
 SPIN_PID=$!
 
 ANALYSIS=$(ffmpeg -i "$INPUT_FILE" -af loudnorm=print_format=summary -f null - 2>&1)
