@@ -10,7 +10,7 @@ cleanup() {
 trap cleanup SIGINT
 
 # ==============================================================================
-# ducking_auto_cartoni.sh - Audio Ottimizzato per Cartoni e Musical
+# ducking_auto_cartoni.sh v1.0 - Audio Ottimizzato per Cartoni e Musical
 # ==============================================================================
 # Preset auto-adattivo per film d'animazione con analisi intelligente del mix audio
 # 

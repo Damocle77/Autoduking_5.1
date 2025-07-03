@@ -10,7 +10,7 @@ cleanup() {
 trap cleanup SIGINT
 
 # ==============================================================================
-# ducking_auto_serie.sh - Audio Ottimizzato per Serie TV di Genere
+# ducking_auto_serie.sh v1.0 - Audio Ottimizzato per Serie TV di Genere
 # ==============================================================================
 # Preset auto-adattivo per serie TV con analisi intelligente del mix audio
 # 

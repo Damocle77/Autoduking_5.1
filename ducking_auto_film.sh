@@ -10,7 +10,7 @@ cleanup() {
 trap cleanup SIGINT
 
 # ==============================================================================
-# ducking_auto_film.sh - Audio Cinematografico Ottimizzato
+# ducking_auto_film.sh v1.0 - Audio Cinematografico Ottimizzato
 # ==============================================================================
 # Preset auto-adattivo per film con analisi intelligente del mix audio
 # 
