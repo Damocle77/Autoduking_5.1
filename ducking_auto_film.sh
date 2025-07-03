@@ -229,10 +229,11 @@ ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
 [FR_comp]volume=${FRONT_FX_REDUCTION}[FRduck]; \
 [SL]volume=1.8,${SURROUND_EQ}[SLduck]; \
 [SR]volume=1.8,${SURROUND_EQ}[SRduck]; \
-[FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}" \
+[FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}[clearvoice]" \
 -map 0:v -c:v copy \
--c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice Film 5.1" \
--map 0:a:1 -c:a:1 copy \
+-map "[clearvoice]" -c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice Film" \
+-map 0:a:0? -c:a:1 copy \
+-map 0:a:1? -c:a:2 copy \
 -map 0:s? -c:s copy \
 -map 0:t? -c:t copy \
 -disposition:a:0 default -disposition:a:1 0 \
