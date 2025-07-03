@@ -89,7 +89,7 @@ Un controllo preliminare ti permette di:
 ---
 
 > ℹ️ **Nota bene, padawan**:  
-> Anche se gli script sono abbastanza robusti da gestire la maggior parte dei file, una piccola pulizia iniziale può fare la differenza tra un risultato *scolpito nel cristallo* e un “perdindirindina”.  
+> Anche se gli script sono abbastanza robusti da gestire la maggior parte dei file, una piccola pulizia iniziale può fare la differenza tra un risultato *scolpito nel cristallo* e un *grande giove!*.  
 > Non è obbligatorio, ma è come mettere i calzini giusti prima di indossare l’armatura.
 
 ---
