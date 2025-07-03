@@ -109,8 +109,9 @@ echo
 echo "RACCOMANDAZIONI AUTOMATICHE PER CARTONI/MUSICAL:"
 
 # Parametri base per cartoni animati e musical
+#Per avere più punch devi aumentare il valore di LFE_REDUCTION, avvicinandoti a 1.0.
 VOICE_BOOST=3.4
-LFE_REDUCTION=0.77
+LFE_REDUCTION=0.82
 LFE_DUCK_THRESHOLD=0.012
 LFE_DUCK_RATIO=3.5
 FX_DUCK_THRESHOLD=0.012
@@ -122,7 +123,7 @@ LFE_ATTACK=50
 LFE_RELEASE=900
 LFE_HP_FREQ=45
 LFE_LP_FREQ=100
-LFE_CROSS_POLES=2
+LFE_CROSS_POLES=4
 
 # ============================================================================
 # ANALISI ADATTIVA E REGOLAZIONI (per cartoni e musical)
@@ -159,11 +160,11 @@ LFE_EQ="equalizer=f=35:width_type=q:w=1.6:g=0.6,equalizer=f=75:width_type=q:w=1.
 echo "ATTIVO: Equalizzazione orchestrale. I bassi sono ora più definiti e musicali, non solo 'boom'."
 
 # Surround per ambientazione e musica
-SURROUND_EQ="equalizer=f=400:width_type=q:w=2.0:g=1.3,equalizer=f=2000:width_type=q:w=2.2:g=1.5,equalizer=f=7000:width_type=q:w=2.0:g=2.0"
+SURROUND_EQ="equalizer=f=400:width_type=q:w=2.0:g=1.3,equalizer=f=1800:width_type=q:w=2.4:g=-1.8,equalizer=f=7000:width_type=q:w=2.0:g=2.0"
 
 # Preparazione sidechain ottimizzata per musica
 COMPAND_PARAMS="attacks=0.01:decays=0.02:points=-60/-60|-30/-30|-15/-10:soft-knee=3:gain=0"
-SIDECHAIN_PREP="highpass=f=120,lowpass=f=5000,volume=2.5,compand=${COMPAND_PARAMS},agate=threshold=-35dB:ratio=1.5:attack=1:release=7000"
+SIDECHAIN_PREP="bandpass=f=2000:width_type=h:w=3600,volume=2.5,compand=${COMPAND_PARAMS},agate=threshold=-35dB:ratio=1.5:attack=1:release=7000"
 
 # EQ Front FX per pulizia e definizione
 FRONT_FX_EQ="highpass=f=90"
@@ -176,7 +177,7 @@ FRONT_FX_EQ="highpass=f=90"
 FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=0.99:limit=0.99"
 
 # 2. Filtro per il canale LFE
-LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=${LFE_CROSS_POLES},lowpass=f=${LFE_LP_FREQ}:poles=${LFE_CROSS_POLES},${LFE_EQ},volume=${LFE_REDUCTION}"
+LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,${LFE_EQ},volume=${LFE_REDUCTION}"
 
 # 3. Parametri per i compressori sidechain
 LFE_SC_PARAMS="threshold=${LFE_DUCK_THRESHOLD}:ratio=${LFE_DUCK_RATIO}:attack=${LFE_ATTACK}:release=${LFE_RELEASE}:makeup=1.0"
@@ -209,9 +210,8 @@ ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
 [SR]volume=1.6,${SURROUND_EQ}[SRduck]; \
 [FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}" \
 -map 0:v -c:v copy \
--c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice Cartoon 5.1" \
--map 0:a -c:a:1 copy \
--map 0:a:1? -c:a:2 copy -map 0:a:2? -c:a:3 copy -map 0:a:3? -c:a:4 copy \
+-c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice Film 5.1" \
+-map 0:a:1 -c:a:1 copy \
 -map 0:s? -c:s copy \
 -map 0:t? -c:t copy \
 -disposition:a:0 default -disposition:a:1 0 \

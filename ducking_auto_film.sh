@@ -110,16 +110,17 @@ echo "RACCOMANDAZIONI AUTOMATICHE CINEMATOGRAFICHE:"
 
 # Parametri base per film cinematografici
 VOICE_BOOST=3.5
-LFE_REDUCTION=0.74
+LFE_REDUCTION=0.75
 LFE_DUCK_THRESHOLD=0.005
 LFE_DUCK_RATIO=3.5
 FX_DUCK_RATIO=2.5
 FX_DUCK_THRESHOLD=0.009
-FRONT_FX_REDUCTION=0.9
+FRONT_FX_REDUCTION=0.92
 FX_ATTACK=15
 FX_RELEASE=300
 LFE_ATTACK=20
 LFE_RELEASE=350
+LFE_LP_FREQ=120
 
 # ============================================================================
 # ANALISI ADATTIVA E REGOLAZIONI (per mix cinematografici)
@@ -158,32 +159,33 @@ if [ $(awk "BEGIN {print ($PEAK > -1.5 && $LRA > 13) ? 1 : 0}") -eq 1 ]; then
     echo "ENGAGE: Protocollo Anti-Detonazione LFE. Domati i sub-bassi per evitare danni strutturali."
 fi
 
-# Regole adattive per EQ voce
+# Regole adattive per EQ voce (FILM)
 if [ $(awk "BEGIN {print ($LUFS < -18) ? 1 : 0}") -eq 1 ]; then
     VOICE_EQ="highpass=f=60,equalizer=f=250:width_type=q:w=2.0:g=1.8,equalizer=f=3500:width_type=q:w=1.8:g=1.6"
     echo "APPLICATO: EQ voce per mix conservativo (enfasi medie-acute)"
 else
-    VOICE_EQ="highpass=f=70,equalizer=f=200:width_type=q:w=2.0:g=1.5,equalizer=f=3000:width_type=q:w=1.6:g=1.4"
-    echo "APPLICATO: EQ voce per mix aggressivo (tagli selettivi)"
+    VOICE_EQ="highpass=f=75,equalizer=f=200:width_type=q:w=2.0:g=1.3,equalizer=f=3000:width_type=q:w=1.6:g=1.4"
+    echo "APPLICATO: EQ voce per mix aggressivo (tagli selettivi, anti-baritono soft)"
 fi
 
 # Regole adattive per film drammatici con dialoghi sommessi
 if [ $(awk "BEGIN {print ($LRA > 18 && $LUFS < -20) ? 1 : 0}") -eq 1 ]; then
     # Per film drammatici con ampia dinamica e dialoghi sommessi
     VOICE_BOOST=$(awk "BEGIN {print $VOICE_BOOST + 0.6}")
-    SIDECHAIN_PREP="highpass=f=100,lowpass=f=4000,volume=3.5,compand=${COMPAND_PARAMS},agate=threshold=-40dB:ratio=1.8:attack=2:release=6000"
+    SIDECHAIN_PREP="bandpass=f=1800:width_type=h:w=3000,volume=3.0,compand=${COMPAND_PARAMS},agate=threshold=-38dB:ratio=1.8:attack=2:release=5000"
+
     echo "APPLICATO: Boost extra dialoghi per mix molto dinamico con voci sommesse"
 fi
 
 # Preparazione sidechain
 COMPAND_PARAMS="attacks=0.02:decays=0.05:points=-60/-60|-25/-25|-12/-8:soft-knee=2:gain=0"
-SIDECHAIN_PREP="highpass=f=100,lowpass=f=4000,volume=3.0,compand=${COMPAND_PARAMS},agate=threshold=-38dB:ratio=1.8:attack=2:release=5000"
+SIDECHAIN_PREP="bandpass=f=1800:width_type=h:w=3000,volume=3.0,compand=${COMPAND_PARAMS},agate=threshold=-38dB:ratio=1.8:attack=2:release=5000"
 
 # EQ LFE cinematografico (se non già definito dalla protezione anti-scoppio)
 LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=65:width_type=q:w=1.8:g=0.4"
 
 # Surround EQ per film d'azione e thriller
-SURROUND_EQ="equalizer=f=180:width_type=q:w=1.8:g=1.1,equalizer=f=2500:width_type=q:w=2.0:g=1.4"
+SURROUND_EQ="equalizer=f=180:width_type=q:w=1.8:g=1.1,equalizer=f=2500:width_type=q:w=2.2:g=-1.5,equalizer=f=8000:width_type=q:w=1.5:g=1.2"
 
 # EQ Front FX per pulizia e definizione
 FRONT_FX_EQ="highpass=f=90"
@@ -196,12 +198,11 @@ FRONT_FX_EQ="highpass=f=90"
 FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=0.99:limit=0.99"
 
 # 2. Filtro per il canale LFE
-LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=120:poles=2,${LFE_EQ},volume=${LFE_REDUCTION}"
+LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,${LFE_EQ},volume=${LFE_REDUCTION}"
 
 # 3. Parametri per i compressori sidechain
 LFE_SC_PARAMS="threshold=${LFE_DUCK_THRESHOLD}:ratio=${LFE_DUCK_RATIO}:attack=${LFE_ATTACK}:release=${LFE_RELEASE}:makeup=1.0"
 FX_SC_PARAMS="threshold=${FX_DUCK_THRESHOLD}:ratio=${FX_DUCK_RATIO}:attack=${FX_ATTACK}:release=${FX_RELEASE}:makeup=1.0"
-
 
 # 4. Filtro finale per tutti i canali
 FINAL_FILTER="aresample=resampler=soxr:precision=28:cutoff=0.95:cheby=1,aformat=channel_layouts=5.1"
@@ -231,8 +232,7 @@ ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
 [FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}" \
 -map 0:v -c:v copy \
 -c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice Film 5.1" \
--map 0:a -c:a:1 copy \
--map 0:a:1? -c:a:2 copy -map 0:a:2? -c:a:3 copy -map 0:a:3? -c:a:4 copy \
+-map 0:a:1 -c:a:1 copy \
 -map 0:s? -c:s copy \
 -map 0:t? -c:t copy \
 -disposition:a:0 default -disposition:a:1 0 \

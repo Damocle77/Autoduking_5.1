@@ -117,12 +117,11 @@ FX_DUCK_THRESHOLD=0.009
 FX_DUCK_RATIO=2.5
 FX_ATTACK=15
 FX_RELEASE=300
-FRONT_FX_REDUCTION=0.9
+FRONT_FX_REDUCTION=0.92
 LFE_ATTACK=20
 LFE_RELEASE=350
 LFE_HP_FREQ=35
 LFE_LP_FREQ=100
-LFE_CROSS_POLES=2
 
 # ============================================================================
 # ANALISI ADATTIVA E REGOLAZIONI (per mix serie TV genere)
@@ -164,13 +163,13 @@ if [ $(awk "BEGIN {print ($LRA < 5 && $LUFS > -18) ? 1 : 0}") -eq 1 ]; then
     echo "APPLICATO: Rilascio ducking più rapido per transizioni fluide"
 fi
 
-# Regole adattive per EQ voce
+# Regole adattive per EQ voce (SERIE TV)
 if [ $(awk "BEGIN {print ($LUFS < -18) ? 1 : 0}") -eq 1 ]; then
-    VOICE_EQ="highpass=f=65,equalizer=f=250:width_type=q:w=2.0:g=1.5,equalizer=f=1000:width_type=q:w=1.8:g=1.4,equalizer=f=3200:width_type=q:w=1.6:g=1.3"
+    VOICE_EQ="highpass=f=70,equalizer=f=250:width_type=q:w=2.0:g=1.5,equalizer=f=1000:width_type=q:w=1.8:g=1.4,equalizer=f=3200:width_type=q:w=1.6:g=1.3"
     echo "APPLICATO: EQ voce per mix conservativo (enfasi medie-acute)"
 else
-    VOICE_EQ="highpass=f=75,equalizer=f=200:width_type=q:w=2.0:g=1.3,equalizer=f=1000:width_type=q:w=1.8:g=1.2,equalizer=f=3200:width_type=q:w=1.6:g=1.0"
-    echo "APPLICATO: EQ voce per mix moderno (tagli selettivi)"
+    VOICE_EQ="highpass=f=80,equalizer=f=200:width_type=q:w=2.0:g=1.1,equalizer=f=1000:width_type=q:w=1.8:g=1.2,equalizer=f=3200:width_type=q:w=1.6:g=1.0"
+    echo "APPLICATO: EQ voce per mix moderno (tagli selettivi, anti-baritono soft)"
 fi
 
 # Ottimizzazione specifica per serie fantasy/sci-fi/horror
@@ -186,10 +185,10 @@ fi
 
 # Preparazione sidechain (più vicina al preset film per migliore equilibrio)
 COMPAND_PARAMS="attacks=0.02:decays=0.05:points=-60/-60|-25/-25|-12/-8:soft-knee=2:gain=0"
-SIDECHAIN_PREP="highpass=f=110,lowpass=f=4000,volume=3.0,compand=${COMPAND_PARAMS},agate=threshold=-38dB:ratio=1.8:attack=2:release=5500"
+SIDECHAIN_PREP="bandpass=f=1800:width_type=h:w=3000,volume=3.0,compand=${COMPAND_PARAMS},agate=threshold=-38dB:ratio=1.8:attack=2:release=5500"
 
 # Filtri surround per serie TV
-SURROUND_EQ="equalizer=f=180:width_type=q:w=1.8:g=1.1,equalizer=f=2500:width_type=q:w=2.0:g=1.4"
+SURROUND_EQ="equalizer=f=180:width_type=q:w=1.8:g=1.1,equalizer=f=2500:width_type=q:w=2.2:g=-1.5,equalizer=f=8000:width_type=q:w=1.5:g=1.2"
 
 # EQ Front FX per pulizia e definizione
 FRONT_FX_EQ="highpass=f=90"
@@ -202,7 +201,8 @@ FRONT_FX_EQ="highpass=f=90"
 FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=0.99:limit=0.99"
 
 # 2. Filtro per il canale LFE
-LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=${LFE_CROSS_POLES},lowpass=f=${LFE_LP_FREQ}:poles=${LFE_CROSS_POLES},${LFE_EQ},volume=${LFE_REDUCTION}"
+LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,${LFE_EQ},volume=${LFE_REDUCTION}"
+
 
 # 3. Parametri per i compressori sidechain
 LFE_SC_PARAMS="threshold=${LFE_DUCK_THRESHOLD}:ratio=${LFE_DUCK_RATIO}:attack=${LFE_ATTACK}:release=${LFE_RELEASE}:makeup=1.0"
@@ -235,9 +235,8 @@ ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
 [SR]volume=1.8,${SURROUND_EQ}[SRduck]; \
 [FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}" \
 -map 0:v -c:v copy \
--c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice Serie 5.1" \
--map 0:a -c:a:1 copy \
--map 0:a:1? -c:a:2 copy -map 0:a:2? -c:a:3 copy -map 0:a:3? -c:a:4 copy \
+-c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice Film 5.1" \
+-map 0:a:1 -c:a:1 copy \
 -map 0:s? -c:s copy \
 -map 0:t? -c:t copy \
 -disposition:a:0 default -disposition:a:1 0 \
