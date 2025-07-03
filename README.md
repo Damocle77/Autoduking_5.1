@@ -1,4 +1,4 @@
-# 🎛️ Autoducking 5.1 - "Tuffati nel suono"
+# 🎛️ Autoducking 5.1 - "Tuffati nel suono" - v1.0
 
 > “Non serve essere Tony Stark per ottimizzare il mix: questi script sono già il tuo Jarvis audio.”
 > “Se vuoi sentire la voce di Bulma anche quando il Vegeta urla, qui trovi gli strumenti adatti!”
@@ -68,6 +68,31 @@ brew install ffmpeg
 - Tutto l’audio viene passato attraverso **SoxR** con precisione 28 bit, cutoff 0.95, filtro chebyshev: aliasing sotto controllo, qualità da sala IMAX anche se usi un AVR entry-level.
 - Il resampling soxr è la “pietra filosofale” del processing: mantiene intatti i dettagli, elimina artefatti digitali, e garantisce compatibilità perfetta con qualsiasi player.
 
+## 🎛️ Verifica consigliata - "Pre-Processing Magico"
+
+Prima di lanciare i tuoi potenti incantesimi audio/video con gli script di questo repository, è **consigliato** rimuovere contenuti inutili o indesiderati e sincerarsi che la traccia da modificare sia effettivaemnte la principale, effettuando una rapida verifica del file con:
+
+- 🛠 **ffMediaMaster** (se ce l'hai, usalo come il Millenium Falcon in un inseguimento),
+- 🌀 **HandBrake** (per domare i demoni multitraccia),
+- 💀 o altri strumenti che non trasformano il tuo file in un *Frankenstein multimediale*.
+
+### 🎯 Perché farlo?
+
+Un controllo preliminare ti permette di:
+
+- **Rimuovere tracce superflue**:  
+  Via flussi audio dimenticati, sottotitoli in klingon, lingue perdute e commenti del regista in dialetto uzbeko.
+  
+- **Impostare correttamente la traccia audio principale**:  
+  I preset lavorano sulla **prima traccia audio (tipicamente `0:a:0`)**. Impostare quella giusta come *default* aiuta ad evitare sorprese e rende il flusso di lavoro più lineare.
+
+---
+
+> ℹ️ **Nota bene, padawan**:  
+> Anche se gli script sono abbastanza robusti da gestire la maggior parte dei file, una piccola pulizia iniziale può fare la differenza tra un risultato *scolpito nel cristallo* e uno “meh”.  
+> Non è obbligatorio, ma è come mettere i calzini giusti prima di indossare l’armatura.
+
+---
 
 ## 🧑‍🚀 Perché usarli - "Perchè sei un Nerd!"
 
