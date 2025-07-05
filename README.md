@@ -59,7 +59,7 @@ Questo script è un **convertitore di alta qualità**. Prende un file (tipicamen
 **Uso:**
 `./ducking_dts_conversion.sh "MioFile_serie_ducked.mkv" *(crea una nuova traccia DTS-HD partendo dalla EAC3-Ducked)`
 
-## 🚀 Come funzionano - “Sintonizza il deflettore"
+## 🚀 Come funzionano - “Modula la frequenza del phaser"
 
 ### Equalizzazione voce italiana
 
