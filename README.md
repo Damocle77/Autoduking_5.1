@@ -12,11 +12,11 @@ Tutti sfruttano analisi loudness avanzata (LUFS, True Peak, LRA), ducking intell
 
 | Script | Target consigliato | Output generato | Focus tecnico principale |
 | :-- | :-- | :-- | :-- |
-| `ducking_auto_cartoni.sh` | Cartoni, musical, Disney/Pixar | `*_cartoon_ducked.mkv` | EQ voci cantate, ducking soft, LFE orchestrale arioso |
+| `ducking_auto_cartoni.sh` | Cartoni, Musical, Disney/Pixar | `*_cartoon_ducked.mkv` | EQ voci cantate, ducking soft, LFE orchestrale arioso |
 *Hiccup e Astrid parlano sopra Sdentato che fa il matto: voce sempre chiara, LFE orchestrale, surround “alla Pixar”*.
-| `ducking_auto_film.sh` | Film d’azione, thriller, horror | `*_film_ducked.mkv` | EQ voce italiana, ducking dinamico, LFE anti-scoppio |
+| `ducking_auto_film.sh` | Film Azione, Thriller, Horror | `*_film_ducked.mkv` | EQ voce italiana, ducking dinamico, LFE anti-scoppio |
 *Dialoghi italiani in primo piano, bassi profondi ma mai invadenti, ducking da sala IMAX anche se Godzilla e Kong si affrontano.*
-| `ducking_auto_serie.sh` | Serie fantasy, sci-fi, horror | `*_serie_ducked.mkv` | EQ voce italiana, ducking adattivo, LFE cinematografico |
+| `ducking_auto_serie.sh` | Serie Fantasy, Sci-Fi, Commedia | `*_serie_ducked.mkv` | EQ voce italiana, ducking adattivo, LFE cinematografico |
 *Daenerys e Jon discutono, draghi volano e fuoco ovunque, ma ogni parola arriva nitida come se fossi a Roccia del Drago.*
 
 ## ⚙️ Requisiti - "Armati come un Mandaloriano"
@@ -25,7 +25,7 @@ Tutti sfruttano analisi loudness avanzata (LUFS, True Peak, LRA), ducking intell
 - **FFmpeg** (>= 7.x, con E-AC3, SoxR, Filtercomplex, Audiograph)
 
 
-## 📥 Installazione in 30 secondi - “Energizza”
+## 📥 Installazione in 30 secondi - “Energizza!”
 
 ```bash
 git clone https://github.com/Damocle77/Autoduking_5.1.git
@@ -49,7 +49,7 @@ Oltre ai processori principali, il repository include due utility per automatizz
 Questo script è un **automatizzatore**. Lancialo in una cartella piena di episodi di una serie TV, e lui penserà a processarli uno dopo l'altro usando `ducking_auto_serie.sh`. Perfetto per preparare un'intera stagione in una sola mossa.
 
 **Uso:**
-`./ducking_serie_batch.sh *(Puoi anche impostare un bitrate custom per tutti i files) ./ducking_serie_batch.sh 640k`
+`./ducking_serie_batch.sh *(Puoi anche impostare un bitrate custom per tutti i files)`
 
 ### ducking_dts_conversion.sh
 > "L'adattatore universale della Flotta Stellare. Aggiunge una porta DTS a qualsiasi cosa."
