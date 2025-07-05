@@ -39,7 +39,25 @@ sudo apt install ffmpeg
 sudo dnf install ffmpeg
 brew install ffmpeg
 ```
+## 🛠️ Script Ausiliari - “I tuoi droidi da battaglia”
 
+Oltre ai processori principali, il repository include due utility per automatizzare e finalizzare il tuo lavoro.
+
+### ducking_serie_batch.sh
+> "Attiva il protocollo 'Binge-Watching'. Jarvis, processa l'intera stagione mentre dormo."
+
+Questo script è un **automatizzatore**. Lancialo in una cartella piena di episodi di una serie TV, e lui penserà a processarli uno dopo l'altro usando `ducking_auto_serie.sh`. Perfetto per preparare un'intera stagione in una sola mossa.
+
+**Uso:**
+`./ducking_serie_batch.sh *(Puoi anche impostare un bitrate custom per tutti i files) ./ducking_serie_batch.sh 640k`
+
+### ducking_dts_conversion.sh
+> "L'adattatore universale della Flotta Stellare. Aggiunge una porta DTS a qualsiasi cosa."
+
+Questo script è un **convertitore di alta qualità**. Prende un file (tipicamente uno già processato con i preset di ducking) e aggiunge una **nuova traccia audio in formato DTS 5.1 a 1536k**. È l'ideale se la tua soundbar o il tuo impianto home cinema applicano effetti speciali (come il Neural:X) solo su tracce DTS.
+
+**Uso:**
+`./ducking_dts_conversion.sh "MioFile_serie_ducked.mkv" *(crea una nuova traccia DTS-HD partendo dalla EAC3-Ducked)`
 
 ## 🚀 Come funzionano - “Sintonizza il deflettore"
 
