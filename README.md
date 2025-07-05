@@ -86,7 +86,7 @@ Questo script è un **convertitore di alta qualità**. Prende un file (tipicamen
 - Tutto l’audio viene passato attraverso **SoxR** con precisione 28 bit, cutoff 0.95, filtro chebyshev: aliasing sotto controllo, qualità da sala IMAX anche se usi un AVR entry-level.
 - Il resampling soxr è la “pietra filosofale” del processing: mantiene intatti i dettagli, elimina artefatti digitali, e garantisce compatibilità perfetta con qualsiasi player.
 
-## 🎛️ Verifica consigliata - "Briefing magico"
+## 🎛️ Verifica consigliata - "Radunatevi nella sala delle Necessità"
 
 Prima di lanciare i tuoi potenti incantesimi audio/video con gli script di questo repository, è **consigliato** rimuovere contenuti inutili o indesiderati e sincerarsi che la traccia da modificare sia effettivaemnte la principale, effettuando una rapida verifica del file con:
 
