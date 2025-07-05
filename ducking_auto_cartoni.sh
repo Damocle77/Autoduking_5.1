@@ -111,11 +111,11 @@ echo "RACCOMANDAZIONI AUTOMATICHE PER CARTONI/MUSICAL:"
 # Parametri base per cartoni animati e musical
 #Per avere più punch devi aumentare il valore di LFE_REDUCTION, avvicinandoti a 1.0.
 VOICE_BOOST=3.4
-LFE_REDUCTION=0.82
+LFE_REDUCTION=0.78
 LFE_DUCK_THRESHOLD=0.012
 LFE_DUCK_RATIO=3.5
 FX_DUCK_THRESHOLD=0.012
-FRONT_FX_REDUCTION=0.92
+FRONT_FX_REDUCTION=0.90
 FX_DUCK_RATIO=2.8
 FX_ATTACK=40
 FX_RELEASE=700
@@ -124,6 +124,7 @@ LFE_RELEASE=900
 LFE_HP_FREQ=45
 LFE_LP_FREQ=100
 LFE_CROSS_POLES=4
+SURROUND_BOOST=1.65
 
 # ============================================================================
 # ANALISI ADATTIVA E REGOLAZIONI (per cartoni e musical)
@@ -206,8 +207,8 @@ ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
 [FR]${FRONT_FX_EQ}[FR_eq]; \
 [FR_eq][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FR_comp]; \
 [FR_comp]volume=${FRONT_FX_REDUCTION}[FRduck]; \
-[SL]volume=1.6,${SURROUND_EQ}[SLduck]; \
-[SR]volume=1.6,${SURROUND_EQ}[SRduck]; \
+[SL]volume=${SURROUND_BOOST},${SURROUND_EQ}[SLduck]; \
+[SR]volume=${SURROUND_BOOST},${SURROUND_EQ}[SRduck]; \
 [FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}[clearvoice]" \
 -map 0:v -c:v copy \
 -map "[clearvoice]" -c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice Cartoni" \

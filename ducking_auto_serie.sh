@@ -110,18 +110,19 @@ echo "RACCOMANDAZIONI AUTOMATICHE SERIE TV:"
 
 # Parametri base (preset serie genere)
 VOICE_BOOST=3.6
-LFE_REDUCTION=0.75
+LFE_REDUCTION=0.70
 LFE_DUCK_THRESHOLD=0.006
 LFE_DUCK_RATIO=3.5
 FX_DUCK_THRESHOLD=0.009
 FX_DUCK_RATIO=2.5
 FX_ATTACK=15
 FX_RELEASE=300
-FRONT_FX_REDUCTION=0.92
+FRONT_FX_REDUCTION=0.85
 LFE_ATTACK=20
 LFE_RELEASE=350
 LFE_HP_FREQ=35
 LFE_LP_FREQ=100
+SURROUND_BOOST=1.6
 
 # ============================================================================
 # ANALISI ADATTIVA E REGOLAZIONI (per mix serie TV genere)
@@ -165,7 +166,8 @@ fi
 
 # Regole adattive per EQ voce (SERIE TV)
 if [ $(awk "BEGIN {print ($LUFS < -18) ? 1 : 0}") -eq 1 ]; then
-    VOICE_EQ="highpass=f=70,equalizer=f=250:width_type=q:w=2.0:g=1.5,equalizer=f=1000:width_type=q:w=1.8:g=1.4,equalizer=f=3200:width_type=q:w=1.6:g=1.3"
+    VOICE_EQ="highpass=f=70,equalizer=f=250:width_type=q:w=2.0:g=1.2,equalizer=f=1000:width_type=q:w=1.8:g=1.1,equalizer=f=3200:width_type=q:w=1.6:g=1.0"
+
     echo "APPLICATO: EQ voce per mix conservativo (enfasi medie-acute)"
 else
     VOICE_EQ="highpass=f=80,equalizer=f=200:width_type=q:w=2.0:g=1.1,equalizer=f=1000:width_type=q:w=1.8:g=1.2,equalizer=f=3200:width_type=q:w=1.6:g=1.0"
@@ -231,8 +233,8 @@ ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
 [FR]${FRONT_FX_EQ}[FR_eq]; \
 [FR_eq][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FR_comp]; \
 [FR_comp]volume=${FRONT_FX_REDUCTION}[FRduck]; \
-[SL]volume=1.8,${SURROUND_EQ}[SLduck]; \
-[SR]volume=1.8,${SURROUND_EQ}[SRduck]; \
+[SL]volume=${SURROUND_BOOST},${SURROUND_EQ}[SLduck]; \
+[SR]volume=${SURROUND_BOOST},${SURROUND_EQ}[SRduck]; \
 [FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}[clearvoice]" \
 -map 0:v -c:v copy \
 -map "[clearvoice]" -c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice Serie" \

@@ -110,17 +110,18 @@ echo "RACCOMANDAZIONI AUTOMATICHE CINEMATOGRAFICHE:"
 
 # Parametri base per film cinematografici
 VOICE_BOOST=3.5
-LFE_REDUCTION=0.75
+LFE_REDUCTION=0.72
 LFE_DUCK_THRESHOLD=0.005
 LFE_DUCK_RATIO=3.5
 FX_DUCK_RATIO=2.5
 FX_DUCK_THRESHOLD=0.009
-FRONT_FX_REDUCTION=0.92
+FRONT_FX_REDUCTION=0.88
 FX_ATTACK=15
 FX_RELEASE=300
 LFE_ATTACK=20
 LFE_RELEASE=350
 LFE_LP_FREQ=120
+SURROUND_BOOST=1.85
 
 # ============================================================================
 # ANALISI ADATTIVA E REGOLAZIONI (per mix cinematografici)
@@ -227,8 +228,8 @@ ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
 [FR]${FRONT_FX_EQ}[FR_eq]; \
 [FR_eq][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FR_comp]; \
 [FR_comp]volume=${FRONT_FX_REDUCTION}[FRduck]; \
-[SL]volume=1.8,${SURROUND_EQ}[SLduck]; \
-[SR]volume=1.8,${SURROUND_EQ}[SRduck]; \
+[SL]volume=${SURROUND_BOOST},${SURROUND_EQ}[SLduck]; \
+[SR]volume=${SURROUND_BOOST},${SURROUND_EQ}[SRduck]; \
 [FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}[clearvoice]" \
 -map 0:v -c:v copy \
 -map "[clearvoice]" -c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice Film" \
