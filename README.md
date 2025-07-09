@@ -114,7 +114,7 @@ Un controllo preliminare ti permette di:
 
 ---
 
-## 🧑‍🚀 Perché usarli - "Perchè sei un Nerd!"
+## 🧑‍🚀 Perché usarli - "Perchè anche tu sei un Nerd!"
 
 - Analisi loudness automatica, come avere un Data che ti monitora il segnale in tempo reale.
 - Dialoghi italiani sempre chiari, anche quando il mix originale sembra uscito da una battaglia su Mustafar.
