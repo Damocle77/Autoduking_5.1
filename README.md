@@ -7,7 +7,7 @@
 ## 💡 Cosa fanno questi script - “Usa tuo scudo di vibranio”
 
 Tre preset Bash, ognuno pensato per un diverso scenario multicanale 5.1.
-Tutti sfruttano analisi loudness avanzata (LUFS, True Peak, LRA), ducking intelligente e filtri di equalizzazione specifici per la lingua italiana, con un occhio, anczi orecchio, di riguardo a LFE e surround. Il tutto, ricampionato via soxr per una qualità da laboratorio SHIELD...questa è la via!
+Tutti sfruttano analisi loudness avanzata (LUFS, True Peak, LRA), ducking intelligente e filtri di equalizzazione specifici per la lingua italiana, con un occhio, anzi orecchio, di riguardo a LFE e surround. Il tutto, ricampionato via soxr per una qualità da laboratorio SHIELD...questa è la via!
 
 
 | Script | Target consigliato | Output generato | Focus tecnico principale |
