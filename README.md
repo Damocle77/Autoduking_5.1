@@ -38,6 +38,8 @@ winget install ffmpeg -e && winget install Git.Git -e
 sudo apt install ffmpeg
 sudo dnf install ffmpeg
 brew install ffmpeg
+
+NB. ffmpeg conviene che sia inserito nell'ambiente di sistema (ENV)
 ```
 ## 🛠️ Script Ausiliari - “I tuoi droidi da battaglia”
 
