@@ -120,6 +120,6 @@ Un controllo preliminare ti permette di:
 - Dialoghi italiani sempre chiari, anche quando il mix originale sembra uscito da una battaglia su Mustafar.
 - Ducking e LFE ottimizzati per ogni scenario: nessun effetto speciale o basso fuori controllo ti farà più perdere una battuta.
 - Ricampionamento soxr: la differenza tra un teletrasporto e una navetta vecchia scuola.
-- Strumenti utilizzati open: ffmpeg, bash, AWK.
+- Perchè gli strumenti utilizzati sono tutti open: ffmpeg, bash, AWK.
 
 >  “Per riportare equilibrio nella Forza ti servono solo un terminale e questi script!”
