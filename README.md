@@ -3,6 +3,7 @@
 > “Non serve essere Tony Stark per ottimizzare il mix: questi script sono già il tuo Jarvis audio.”
 > “Se vuoi sentire la voce di Bulma anche quando il Vegeta urla, qui trovi gli strumenti adatti!”
 > “Dialoghi italiani chiari come un cristallo di Kyber, LFE controllato come il motore a curvatura della Voyager.”
+> “By Sandro D@mocle77 Sabbioni“.
 
 ## 💡 Cosa fanno questi script - “Usa tuo scudo di vibranio”
 
@@ -122,4 +123,4 @@ Un controllo preliminare ti permette di:
 - Ricampionamento soxr: la differenza tra un teletrasporto e una navetta vecchia scuola.
 - Strumenti utilizzati open: ffmpeg, bash, AWK.
 
->  “Per riportare equilibrio nella Forza ti servono solo un terminale e questi script! By Sandro D@mocle77 Sabbioni.”
+>  “Per riportare equilibrio nella Forza ti servono solo un terminale e questi script!”
