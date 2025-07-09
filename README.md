@@ -122,4 +122,4 @@ Un controllo preliminare ti permette di:
 - Ricampionamento soxr: la differenza tra un teletrasporto e una navetta vecchia scuola.
 - Strumenti utilizzati open: ffmpeg, bash, AWK.
 
->  “Per riportare equilibrio nella Forza ti servono solo un terminale e questi script.”
+>  “Per riportare equilibrio nella Forza ti servono solo un terminale e questi script! By Sandro D@mocle77 Sabbioni.”
