@@ -6,19 +6,29 @@
 
 ## 💡 Cosa fanno questi script - “Usa il tuo scudo di vibranio”
 
-Tre preset Bash, ognuno pensato per un diverso scenario multicanale 5.1.
-Tutti sfruttano analisi loudness avanzata (LUFS, True Peak, LRA), ducking intelligente e filtri di equalizzazione specifici per la lingua italiana, con un occhio, anzi orecchio, di riguardo a LFE e surround. Il tutto, ricampionato via soxr per una qualità da laboratorio SHIELD... questa è la via!
+Tre preset Bash, ognuno calibrato per un diverso universo narrativo. Tutti sfruttano una catena di processamento avanzata per trasformare un mix standard in un'esperienza audio cinematografica su misura. Le tecnologie chiave sono:
+
+* **Analisi Adattiva:** Lo script scansiona l'audio come un droide protocollare, misurando Loudness (LUFS), Picchi Reali (True Peak) e Dinamica (LRA) per capire con chi ha a che fare.
+* **Ducking Intelligente:** Usa la traccia vocale per creare un "sidechain" che abbassa dinamicamente gli altri suoni. È come uno scudo deflettore che si attiva solo quando serve per proteggere i dialoghi.
+* **EQ "Jedi":** Modella il suono con una combinazione di `de-esser` (per domare le sibilanti) e filtri `highshelf` (per dare chiarezza e aria), garantendo un risultato naturale e mai artificiale.
+
+Questa è la via!
 
 
-| Script | Target consigliato | Output generato | Focus tecnico principale |
+| Script | Missione | Output Generato | Tattiche Speciali |
 | :-- | :-- | :-- | :-- |
-| `ducking_auto_cartoni.sh` | Cartoni, Musical, Disney/Pixar | `*_cartoon_ducked.mkv` | EQ voci cantate, ducking soft, LFE orchestrale arioso |
+| **`ducking_auto_cartoni.sh`** | Cartoni, Musical, Disney/Pixar | `*_cartoon_ducked.mkv` | **Voci cristalline e musicali:** EQ ottimizzato per canzoni e dialoghi veloci.<br>**Ducking delicato:** Abbassa la musica e gli effetti dolcemente per non rovinare la magia.<br>**LFE orchestrale:** Bassi ariosi che supportano l'orchestra, non la soffocano. |
+| **`ducking_auto_film.sh`** | Film Azione, Thriller, Horror | `*_film_ducked.mkv` | **Dialoghi a prova di bomba:** Ducking aggressivo per far emergere la voce anche durante le esplosioni.<br>**LFE anti-detonazione:** Un high-pass dinamico doma i sub-bassi per proteggere il tuo subwoofer.<br>**Fronte sonoro IMAX:** Coerenza totale tra i canali frontali per un'immersione da cinema. |
+| **`ducking_auto_serie.sh`** | Serie Fantasy, Sci-Fi, Commedia | `*_serie_ducked.mkv` | **Preset "tuttofare":** Il perfetto equilibrio tra il mondo dei film e quello dei cartoni.<br>**Ducking adattivo:** Si regola in base alla dinamica del mix: più aggressivo nelle scene d'azione, più soft nei dialoghi.<br>**Chiarezza da binge-watching:** Ottimizzato per lunghe sessioni d'ascolto senza affaticare l'orecchio. |
 
-*Hiccup e Astrid parlano sopra Sdentato che fa il matto: voce sempre chiara, LFE orchestrale, surround “alla Pixar”*.
-| `ducking_auto_film.sh` | Film Azione, Thriller, Horror | `*_film_ducked.mkv` | EQ voce italiana, ducking dinamico, LFE anti-scoppio |
-*Dialoghi italiani in primo piano, bassi profondi ma mai invadenti, ducking da sala IMAX anche se Godzilla e Kong si affrontano.*
-| `ducking_auto_serie.sh` | Serie Fantasy, Sci-Fi, Commedia | `*_serie_ducked.mkv` | EQ voce italiana, ducking adattivo, LFE cinematografico |
-*Daenerys e Jon discutono, draghi volano e fuoco ovunque, ma ogni parola arriva nitida come se fossi a Roccia del Drago.*
+### In Pratica - Scenari dal Multiverso
+
+* **Per `ducking_auto_cartoni.sh`:**
+*Hiccup e Astrid parlano mentre Sdentato fa il matto: la loro voce resta sempre chiara, l'orchestra ha un LFE potente ma arioso e i surround ti portano dritto a Berk, in stile "Pixar".*
+* **Per `ducking_auto_film.sh`:**
+*Dialoghi italiani in primo piano con bassi profondi ma mai invadenti. Il ducking da sala IMAX garantisce che tu senta ogni parola anche se Godzilla e Kong si stanno affrontando in centro città.*
+* **Per `ducking_auto_serie.sh`:**
+*Daenerys e Jon discutono mentre i draghi volano e sputano fuoco ovunque. Ogni loro parola arriva nitida, come se fossi con loro a Roccia del Drago.*
 
 ## ⚙️ Requisiti - "Armati come un Mandaloriano"
 
