@@ -161,9 +161,8 @@ if [ $(awk "BEGIN {print ($PEAK > -1.5 && $LRA > 13) ? 1 : 0}") -eq 1 ]; then
 fi
 
 # Filtro pulizia voce italina
-#VOICE_EQ="highpass=f=80,highshelf=f=3500:g=0.5,highshelf=f=10000:g=0.25"
 VOICE_EQ="highpass=f=80,deesser,highshelf=f=3500:g=0.5,highshelf=f=10000:g=0.25"
-echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz). Rimuove rumori bassi."
+echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz, highshelf mirato e deesser)."
 
 # Regole per film drammatici con dialoghi sommessi
 if [ $(awk "BEGIN {print ($LRA > 18 && $LUFS < -20) ? 1 : 0}") -eq 1 ]; then

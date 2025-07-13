@@ -165,10 +165,9 @@ if [ $(awk "BEGIN {print ($LRA < 5 && $LUFS > -18) ? 1 : 0}") -eq 1 ]; then
     echo "APPLICATO: Rilascio ducking più rapido per transizioni fluide"
 fi
 
-# Filtro pulizia voce italina
-#VOICE_EQ="highpass=f=80,highshelf=f=3500:g=0.5,highshelf=f=10000:g=0.25"
+# Filtro pulizia voce italina con deesser
 VOICE_EQ="highpass=f=80,deesser,highshelf=f=3500:g=0.5,highshelf=f=10000:g=0.25"
-echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz)."
+echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz, highshelf mirato e deesser)."
 # Filtro LFE cinematografico
 LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=65:width_type=q:w=1.8:g=0.4"
 echo "APPLICATO: LFE cinematografico arioso per definizione e impatto"
