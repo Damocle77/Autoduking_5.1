@@ -12,9 +12,6 @@ Tre preset Bash, ognuno calibrato per un diverso universo narrativo. Tutti sfrut
 * **Ducking Intelligente:** Usa la traccia vocale per creare un "sidechain" che abbassa dinamicamente gli altri suoni. È come uno scudo deflettore che si attiva solo quando serve per proteggere i dialoghi.
 * **EQ "Jedi":** Modella il suono con una combinazione di `de-esser` (per domare le sibilanti) e filtri `highshelf` (per dare chiarezza e aria), garantendo un risultato naturale e mai artificiale.
 
-Questa è la via!
-
-
 | Script | Missione | Output Generato | Tattiche Speciali |
 | :-- | :-- | :-- | :-- |
 | **`ducking_auto_cartoni.sh`** | Cartoni, Musical, Disney/Pixar | `*_cartoon_ducked.mkv` | **Voci cristalline e musicali:** EQ ottimizzato per canzoni e dialoghi veloci.<br>**Ducking delicato:** Abbassa la musica e gli effetti dolcemente per non rovinare la magia.<br>**LFE orchestrale:** Bassi ariosi che supportano l'orchestra, non la soffocano. |
