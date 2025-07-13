@@ -74,7 +74,7 @@ Questi script non sono solo una catena di comandi, ma il risultato di una precis
 
 Le versioni precedenti usavano `equalizer` parametrici per scolpire il suono. Potenti, ma rischiosi: come usare una spada laser con troppa foga, potevano suonare artificiali o "scavati".
 
-**La nuova via:** Siamo passati a filtri `highshelf`. Invece di un picco innaturale, l'highshelf crea una "rampa" dolce che alza le alte frequenze in modo più musicale e trasparente. Il risultato è un suono più naturale, che migliora la chiarezza senza mai sembrare finto.
+**La nuova via:** Adesso vengono usati filtri `highshelf`. Invece di un picco innaturale, l'highshelf crea una "rampa" dolce che alza le alte frequenze in modo più musicale e trasparente. Il risultato è un suono più naturale, che migliora la chiarezza senza mai sembrare finto.
 
 ### 2. Fronte Sonoro Unito: Formazione a Testuggine!
 
