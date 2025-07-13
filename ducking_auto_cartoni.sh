@@ -154,7 +154,8 @@ else
     echo "APPLICATO: Taglio LFE standard (${LFE_HP_FREQ}Hz) per fondamenti orchestrali"
 fi
 
-VOICE_EQ="highpass=f=80,highshelf=f=3500:g=0.5,highshelf=f=10000:g=0.25"
+#VOICE_EQ="highpass=f=80,highshelf=f=3500:g=0.5,highshelf=f=10000:g=0.25"
+VOICE_EQ="highpass=f=80,deesser,highshelf=f=3500:g=0.5,highshelf=f=10000:g=0.25"
 echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz)."
 
 LFE_EQ="equalizer=f=35:width_type=q:w=1.6:g=0.6,equalizer=f=75:width_type=q:w=1.8:g=0.4"
