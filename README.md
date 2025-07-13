@@ -1,4 +1,4 @@
-# 🎛️ Autoducking 5.1 - "Tuffati nel suono" - v1.0
+# 🎛️ Autoducking 5.1 - "Tuffati nel suono" - v1.2
 
 > “Non serve essere Tony Stark per ottimizzare il mix: questi script sono già il tuo Jarvis audio.”
 > “Se vuoi sentire la voce di Bulma anche quando il Vegeta urla, qui trovi gli strumenti adatti!”
@@ -65,7 +65,7 @@ Questo script è un **convertitore di alta qualità**. Prende un file (tipicamen
 
 ### Equalizzazione voce italiana
 
-- **Filtro centrale** ottimizzato tra 200 e 3500Hz, con highpass tra 60 e 80Hz: così ogni “Che c’è?” si sente anche se Godzilla pesta i piedi.
+- **Filtro centrale** ottimizzato a 3500Hz e 10000Hz, con highpass ad 80Hz: così ogni “Che c’è?” si sente anche se Godzilla pesta i piedi.
 - Il boost sulle medie frequenze è adattivo: nei mix compressi (cartoni moderni, action rumorosi) la voce viene spinta in avanti, nei musical classici si preserva la dinamica naturale.
 - L’equalizzazione è pensata per il timbro italiano: niente voci nasali o sibilanti, solo chiarezza e presenza, come se stessi ascoltando un doppiaggio da Oscar.
 
