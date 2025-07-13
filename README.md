@@ -113,7 +113,7 @@ Un controllo preliminare ti permette di:
 
 ---
 
-## 🧑‍🚀 Perché usarli - "Perchè anche tu sei un Nerd!"
+## 🧑‍🚀 Perché usarli - "Perchè anche tu sei Nerd!"
 
 - Analisi loudness automatica, come avere un Data che ti monitora il segnale in tempo reale.
 - Dialoghi italiani sempre chiari, anche quando il mix originale sembra uscito da una battaglia su Mustafar.
@@ -121,4 +121,4 @@ Un controllo preliminare ti permette di:
 - Ricampionamento soxr: la differenza tra un teletrasporto e una navetta vecchia scuola.
 - Perchè gli strumenti utilizzati sono tutti open: ffmpeg, bash, AWK.
 
->  “Per riportare equilibrio nella Forza ti servono solo un terminale e questi script!”
+>  “Per riportare equilibrio nella Forza ti servono solo un terminale bash e questi script!”
