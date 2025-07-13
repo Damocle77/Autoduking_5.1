@@ -1,9 +1,3 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" class="logo" width="120"/>
-
-# potresti integrare le nuove info nel presente readme?
-
-Certamente! Ecco il tuo `README.md` aggiornato con la nuova sezione "Filosofia Jedi" che spiega tutte le scelte tecniche che abbiamo discusso. Ho mantenuto lo stile e il tono che già usi.
-
 # 🎛️ Autoducking 5.1 - "Tuffati nel suono" - v1.2
 
 > “Non serve essere Tony Stark per ottimizzare il mix: questi script sono già il tuo Jarvis audio.”
@@ -127,8 +121,4 @@ I preset lavorano sulla **prima traccia audio (tipicamente `0:a:0`)**. Impostare
 - Perchè gli strumenti utilizzati sono tutti open: ffmpeg, bash, AWK.
 
 > “Per riportare equilibrio nella Forza ti servono solo un terminale bash e questi script!”
-
-<div style="text-align: center">⁂</div>
-
-[^1]: README.md
 
