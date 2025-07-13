@@ -61,31 +61,24 @@ Questo script è un **convertitore di alta qualità**. Prende un file (tipicamen
 **Uso:**
 `./ducking_dts_conversion.sh "MioFile_serie_ducked.mkv" *(crea una nuova traccia DTS-HD partendo dalla EAC3-Ducked)`
 
-## 🚀 Come funzionano - “Modula la frequenza del phaser"
+🚀 La Filosofia Jedi dietro gli Script - "Questa è la Via"
+Questi script non sono solo una catena di comandi, ma il risultato di una precisa filosofia audio. Se ti chiedi perché sono state fatte certe scelte (come l'abbandono degli EQ parametrici), qui trovi le risposte dal Consiglio Jedi dell'Audio.
 
-### Equalizzazione voce italiana
+1. Dall'EQ Chirurgico all'Highshelf Musicale: Abbraccia la Forza
+Le versioni precedenti usavano equalizer parametrici per scolpire il suono. Potenti, ma rischiosi: come usare una spada laser con troppa foga, potevano suonare artificiali o "scavati".
 
-- **Filtro centrale** ottimizzato a 3500Hz e 10000Hz, con highpass ad 80Hz: così ogni “Che c’è?” si sente anche se Godzilla pesta i piedi.
-- Il boost sulle medie frequenze è adattivo: nei mix compressi (cartoni moderni, action rumorosi) la voce viene spinta in avanti, nei musical classici si preserva la dinamica naturale.
-- L’equalizzazione è pensata per il timbro italiano: niente voci nasali o sibilanti, solo chiarezza e presenza, come se stessi ascoltando un doppiaggio da Oscar.
+La nuova via: Siamo passati a filtri highshelf. Invece di un picco innaturale, l'highshelf crea una "rampa" dolce che alza le alte frequenze in modo più musicale e trasparente. Il risultato è un suono più naturale, che migliora la chiarezza senza mai sembrare finto.
 
+2. Fronte Sonoro Unito: Formazione a Testuggine!
+Perché i canali frontali (Sinistro, Centro, Destro) usano lo stesso identico EQ? Per coerenza. Questo garantisce che un suono che si muove sullo schermo (un'astronave, un'auto, un proiettile) mantenga lo stesso "colore" timbrico per tutto il suo percorso. Si crea un fronte sonoro solido e credibile, non tre altoparlanti che fanno cose diverse.
 
-### Ducking Dinamico in tempo reale
+3. Il De-Esser: L'Arma Segreta contro le Sibilanti
+Aumentare la chiarezza con gli highshelf ha un effetto collaterale: può rendere le sibilanti ("s", "z", "f") un po' troppo aggressive. Qui entra in gioco il deesser. È un'arma di precisione che agisce come un cecchino: individua e attenua solo le sibilanti fastidiose, lasciando intatta tutta la brillantezza e l'aria che abbiamo aggiunto. È il tocco da professionista che rende l'ascolto piacevole anche per ore.
 
-- **Sidechain**: quando la voce parla, effetti e LFE si abbassano in tempo reale, stile “scudo deflettore” di Star Trek che si attiva solo quando serve.
-- I parametri di attack/release sono adattivi: nei musical e cartoni il ducking è più morbido, nei film e serie più aggressivi è più deciso, così il dialogo resta sempre in primo piano senza snaturare il mix.
+4. Audio "Remastered", non "HD": La Differenza che Conta
+Dopo tutto questo lavoro, l'audio diventa "HD"? Tecnicamente, no. L'Audio ad Alta Risoluzione (Hi-Res) dipende dalla qualità della registrazione originale (es. 24-bit/96kHz).
 
-
-### LFE arioso, controllato ed equalizzato
-
-- **LFE** mai “scoppiettante”: taglio passa-alto (30-50Hz), lowpass (100-120Hz), equalizzazione selettiva per evitare saturazioni e distorsioni anche su subwoofer modesti.
-- Nei musical, il LFE viene reso più “arioso” per non coprire archi e voci; nei film d’azione, la protezione anti-scoppio entra in gioco come un campo di forza di Wakanda.
-- Il boost sui bassi viene ridotto automaticamente in presenza di mix troppo dinamici o con picchi elevati.
-
-### Ricampionamento SoxR
-
-- Tutto l’audio viene passato attraverso **SoxR** con precisione 28 bit, cutoff 0.95, filtro chebyshev: aliasing sotto controllo, qualità da sala IMAX anche se usi un AVR entry-level.
-- Il resampling soxr è la “pietra filosofale” del processing: mantiene intatti i dettagli, elimina artefatti digitali, e garantisce compatibilità perfetta con qualsiasi player.
+Quello che fanno questi script è ancora più utile: eseguono un remastering intelligente del suono esistente. Migliorano drasticamente la qualità percepita bilanciando i livelli, aumentando la chiarezza e controllando i bassi. È la differenza tra un film girato nativamente in 8K e un vecchio classico restaurato a regola d'arte in 4K: il risultato finale è semplicemente... migliore.
 
 ## 🎛️ Verifica consigliata - "Radunatevi nella sala delle Necessità"
 
