@@ -56,7 +56,7 @@ Questo script è un **automatizzatore**. Lancialo in una cartella piena di episo
 ### ducking_dts_conversion.sh
 > "L'adattatore universale della Flotta Stellare. Aggiunge una porta DTS a qualsiasi cosa."
 
-Questo script è un **convertitore di alta qualità**. Prende un file (tipicamente uno già processato con i preset di ducking) e aggiunge una **nuova traccia audio in formato DTS 5.1 a 1536k**. È l'ideale se la tua soundbar o il tuo impianto home cinema applicano effetti speciali (come il Neural:X) solo su tracce DTS.
+Questo script è un **convertitore di alta qualità**. Prende un file (tipicamente uno già processato con i preset di ducking) e aggiunge una **nuova traccia audio in formato DTS 5.1 a 756k**. È l'ideale se la tua soundbar o l'impianto home cinema applicano effetti speciali (come il Neural:X) solo su tracce DTS.
 
 **Uso:**
 `./ducking_dts_conversion.sh "MioFile_serie_ducked.mkv" *(crea una nuova traccia DTS-HD partendo dalla EAC3-Ducked)`
@@ -81,7 +81,6 @@ Questo script è un **convertitore di alta qualità**. Prende un file (tipicamen
 - **LFE** mai “scoppiettante”: taglio passa-alto (30-50Hz), lowpass (100-120Hz), equalizzazione selettiva per evitare saturazioni e distorsioni anche su subwoofer modesti.
 - Nei musical, il LFE viene reso più “arioso” per non coprire archi e voci; nei film d’azione, la protezione anti-scoppio entra in gioco come un campo di forza di Wakanda.
 - Il boost sui bassi viene ridotto automaticamente in presenza di mix troppo dinamici o con picchi elevati.
-
 
 ### Ricampionamento SoxR
 
