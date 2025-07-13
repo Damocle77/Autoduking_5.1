@@ -30,7 +30,7 @@ show_spinner() {
 # ==============================================================================
 # INIZIO DELLO SCRIPT PRINCIPALE
 # ==============================================================================
-# ducking_auto_cartoni.sh v1.0 - Audio Ottimizzato per Cartoni e Musical
+# ducking_auto_cartoni.sh v1.2 - Audio Ottimizzato per Cartoni e Musical
 #
 # + Analisi LUFS/True Peak completa con valutazione del contenuto
 # + Ottimizzazione adattiva per dialoghi e voci cantate perfettamente intellegibili
@@ -154,14 +154,17 @@ else
     echo "APPLICATO: Taglio LFE standard (${LFE_HP_FREQ}Hz) per fondamenti orchestrali"
 fi
 
-VOICE_EQ="highpass=f=80,equalizer=f=200:width_type=q:w=2.0:g=1.0,equalizer=f=1000:width_type=q:w=1.8:g=1.7,equalizer=f=4000:width_type=q:w=1.5:g=2.2"
+VOICE_EQ="highpass=f=80,highshelf=f=3500:g=0.5,highshelf=f=10000:g=0.25"
+echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz)."
+
 LFE_EQ="equalizer=f=35:width_type=q:w=1.6:g=0.6,equalizer=f=75:width_type=q:w=1.8:g=0.4"
 echo "ATTIVO: Equalizzazione orchestrale. I bassi sono ora più definiti e musicali, non solo 'boom'."
 
-SURROUND_EQ="equalizer=f=400:width_type=q:w=2.0:g=1.3,equalizer=f=1800:width_type=q:w=2.4:g=-1.8,equalizer=f=7000:width_type=q:w=2.0:g=2.0"
+#SURROUND_EQ="equalizer=f=400:width_type=q:w=2.0:g=1.3,equalizer=f=1800:width_type=q:w=2.4:g=-1.8,equalizer=f=7000:width_type=q:w=2.0:g=2.0"
+SURROUND_EQ="highpass=f=60,highshelf=f=5000:g=0.25"
 COMPAND_PARAMS="attacks=0.01:decays=0.02:points=-60/-60|-30/-30|-15/-10:soft-knee=3:gain=0"
 SIDECHAIN_PREP="bandpass=f=2000:width_type=h:w=3600,volume=2.5,compand=${COMPAND_PARAMS},agate=threshold=-35dB:ratio=1.5:attack=1:release=7000"
-FRONT_FX_EQ="highpass=f=90"
+FRONT_FX_EQ="${VOICE_EQ}"
 
 FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=0.99:limit=0.99"
 LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,${LFE_EQ},volume=${LFE_REDUCTION}"
@@ -193,7 +196,7 @@ ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
 [SR]volume=${SURROUND_BOOST},${SURROUND_EQ}[SRduck]; \
 [FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}[clearvoice]" \
 -map 0:v -c:v copy \
--map "[clearvoice]" -c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice Cartoni" \
+-map "[clearvoice]" -c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice EAC3 Cartoni" \
 -map 0:a:0? -c:a:1 copy \
 -map 0:a:1? -c:a:2 copy \
 -map 0:s? -c:s copy \

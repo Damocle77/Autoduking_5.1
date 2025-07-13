@@ -29,7 +29,7 @@ show_spinner() {
 # ==============================================================================
 # INIZIO DELLO SCRIPT PRINCIPALE
 # ==============================================================================
-# ducking_auto_film.sh v1.0 - Audio Cinematografico Ottimizzato
+# ducking_auto_film.sh v1.2 - Audio Cinematografico Ottimizzato
 # Preset auto-adattivo per film con analisi intelligente del mix audio
 #
 # + Analisi LUFS/True Peak completa con valutazione del contenuto
@@ -44,7 +44,7 @@ show_spinner() {
 # Controllo argomenti
 INPUT_FILE="$1"
 OUTPUT_FILE="${INPUT_FILE%.*}_film_ducked.mkv"
-BITRATE="768k"
+BITRATE="640k"
 [ ! -z "$2" ] && BITRATE="$2"
 
 if [ -z "$INPUT_FILE" ]; then
@@ -160,14 +160,9 @@ if [ $(awk "BEGIN {print ($PEAK > -1.5 && $LRA > 13) ? 1 : 0}") -eq 1 ]; then
     echo "ENGAGE: Protocollo Anti-Detonazione LFE. Domati i sub-bassi."
 fi
 
-# Regole adattive per EQ voce
-if [ $(awk "BEGIN {print ($LUFS < -18) ? 1 : 0}") -eq 1 ]; then
-    VOICE_EQ="highpass=f=60,equalizer=f=250:width_type=q:w=2.0:g=1.8,equalizer=f=3500:width_type=q:w=1.8:g=1.6"
-    echo "APPLICATO: EQ voce per mix conservativo (enfasi medie-acute)."
-else
-    VOICE_EQ="highpass=f=75,equalizer=f=200:width_type=q:w=2.0:g=1.3,equalizer=f=3000:width_type=q:w=1.6:g=1.4"
-    echo "APPLICATO: EQ voce per mix aggressivo (tagli selettivi)."
-fi
+# Filtro pulizia voce italina
+VOICE_EQ="highpass=f=80,highshelf=f=3500:g=0.5,highshelf=f=10000:g=0.25"
+echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz). Rimuove rumori bassi."
 
 # Regole per film drammatici con dialoghi sommessi
 if [ $(awk "BEGIN {print ($LRA > 18 && $LUFS < -20) ? 1 : 0}") -eq 1 ]; then
@@ -179,8 +174,9 @@ fi
 COMPAND_PARAMS="attacks=0.02:decays=0.05:points=-60/-60|-25/-25|-12/-8:soft-knee=2:gain=0"
 SIDECHAIN_PREP="bandpass=f=1800:width_type=h:w=3000,volume=3.0,compand=${COMPAND_PARAMS},agate=threshold=-38dB:ratio=1.8:attack=2:release=5000"
 LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=65:width_type=q:w=1.8:g=0.4"
-SURROUND_EQ="equalizer=f=180:width_type=q:w=1.8:g=1.1,equalizer=f=2500:width_type=q:w=2.2:g=-1.5,equalizer=f=8000:width_type=q:w=1.5:g=1.2"
-FRONT_FX_EQ="highpass=f=90"
+#SURROUND_EQ="equalizer=f=180:width_type=q:w=1.8:g=1.1,equalizer=f=2500:width_type=q:w=2.2:g=-1.5,equalizer=f=8000:width_type=q:w=1.5:g=1.2"
+SURROUND_EQ="highpass=f=60,highshelf=f=5000:g=0.25"
+FRONT_FX_EQ="${VOICE_EQ}"
 
 # Riorganizzazione filtri finali
 FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=0.99:limit=0.99"
@@ -213,7 +209,7 @@ ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
 [SR]volume=${SURROUND_BOOST},${SURROUND_EQ}[SRduck]; \
 [FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}[clearvoice]" \
 -map 0:v -c:v copy \
--map "[clearvoice]" -c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice Film" \
+-map "[clearvoice]" -c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice EAC3 Film" \
 -map 0:a:0? -c:a:1 copy \
 -map 0:a:1? -c:a:2 copy \
 -map 0:s? -c:s copy \
