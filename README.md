@@ -70,8 +70,25 @@ Questo script è un **automatizzatore**. Lancialo in una cartella piena di episo
 
 Questo script è un **convertitore di alta qualità**. Prende un file (tipicamente uno già processato con i preset di ducking) e aggiunge una **nuova traccia audio in formato DTS 5.1 a 756k**. È l'ideale se la tua soundbar o l'impianto home cinema applicano effetti speciali (come il Neural:X) solo su tracce DTS.
 
-**Uso:**
-`./ducking_dts_conversion.sh "MioFile_serie_ducked.mkv" *(crea una nuova traccia DTS-HD partendo dalla EAC3-Ducked)`
+### Conversione standard (Clearvoice di default)
+
+```bash
+./ducking_dts_conversion.sh file.mkv
+```
+Converte la **traccia 1** (Clearvoice EAC3) in DTS.
+
+### Conversione di una traccia specifica
+
+```bash
+./ducking_dts_conversion.sh file.mkv 0
+```
+Converte la **traccia 0** (audio originale) in DTS.
+
+```bash
+./ducking_dts_conversion.sh file.mkv 2
+```
+Converte la **traccia 2** (audio ulteriore) in DTS.
+
 
 ## 🚀 La Filosofia Jedi dietro gli Script - "Questa è la Via"
 
