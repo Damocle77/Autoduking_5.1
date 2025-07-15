@@ -50,14 +50,15 @@ OUTPUT="${INPUT%.*}_DTS.mkv"
 
 echo "🔄 Avvio conversione DTS 5.1..."
 
-ffmpeg -i "$INPUT" \
+ffmpeg -hwaccel auto -threads 0 -i "$INPUT" \
     -map 0:v -c:v copy \
-    -map 0:$AUDIO_TRACK \
-    -c:a dts \
+    -map 0:a -c:a copy \
+    -map 0:$AUDIO_TRACK -c:a dts \
     -strict experimental \
-    -ar 48000 \
-    -b:a 768k \
-    -filter:a "volume=+2dB" \
+    -ar:a:3 48000 \
+    -b:a:3 768k \
+    -filter:a:3 "volume=+2dB" \
+    -metadata:s:a:3 title="Clearvoice DTS" \
     -map 0:s? -c:s copy \
     -y "$OUTPUT"
 
