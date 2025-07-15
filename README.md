@@ -26,6 +26,7 @@ Tre preset Bash, ognuno calibrato per un diverso universo narrativo. Tutti sfrut
 *Dialoghi italiani in primo piano con bassi profondi ma mai invadenti. Il ducking da sala IMAX garantisce che tu senta ogni parola anche se Godzilla e Kong si stanno affrontando in centro città.*
 * **Per `ducking_auto_serie.sh`:**
 *Daenerys e Jon discutono mentre i draghi volano e sputano fuoco ovunque. Ogni loro parola arriva nitida, come se fossi con loro a Roccia del Drago.*
+*(Puoi anche impostare un bitrate custom per tutti i files)
 
 ## ⚙️ Requisiti - "Armati come un Mandaloriano"
 
