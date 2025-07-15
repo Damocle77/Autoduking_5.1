@@ -41,3 +41,29 @@ else
   # …altrimenti usa l’indice passato da riga di comando
   AUDIO_TRACK="$2"
 fi
+
+# ========================================
+#       CONVERSIONE DTS 5.1
+# ========================================
+
+OUTPUT="${INPUT%.*}_DTS.mkv"
+
+echo "🔄 Avvio conversione DTS 5.1..."
+
+ffmpeg -i "$INPUT" \
+    -map 0:v -c:v copy \
+    -map 0:$AUDIO_TRACK \
+    -c:a dts \
+    -strict experimental \
+    -ar 48000 \
+    -b:a 768k \
+    -filter:a "volume=+2dB" \
+    -map 0:s? -c:s copy \
+    -y "$OUTPUT"
+
+if [ $? -eq 0 ]; then
+    echo "✅ Conversione completata: $OUTPUT"
+else
+    echo "❌ Errore durante la conversione"
+    exit 1
+fi
