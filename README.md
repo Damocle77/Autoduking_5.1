@@ -5,13 +5,13 @@
 > “Dialoghi italiani chiari come un cristallo di Kyber, LFE controllato come il motore a curvatura della Voyager. By Sandro "D@mocle77" Sabbioni.”
 
 ## 📚 Indice
-- [Cosa fanno questi script](#-cosa-fanno-questi-script---usa-il-tuo-scudo-di-vibranio)
-- [Flusso di lavoro tipico](#-flusso-di-lavoro-tipico-per-impazienti)
-- [Requisiti](#-requisiti---armati-come-un-mandaloriano)
-- [Installazione](#-installazione-in-30-secondi---che-la-forza-sia-con-te)
-- [Script Ausiliari](#-script-ausiliari---i-tuoi-droidi-da-battaglia)
-- [La Filosofia Jedi](#-la-filosofia-jedi-dietro-gli-script---questa-è-la-via)
-- [Perché usarli](#-perché-usarli---perchè-anche-tu-sei-un-nerd)
+- [Cosa fanno questi script](#cosa-fanno-questi-script--usa-il-tuo-scudo-di-vibranio)
+- [Flusso di lavoro tipico](#flusso-di-lavoro-tipico-per-impazienti)
+- [Requisiti](#requisiti--armati-come-un-mandaloriano)
+- [Installazione](#installazione-in-30-secondi--che-la-forza-sia-con-te)
+- [Script Ausiliari](#script-ausiliari--i-tuoi-droidi-da-battaglia)
+- [La Filosofia Jedi](#la-filosofia-jedi-dietro-gli-script--questa-è-la-via)
+- [Perché usarli](#perché-usarli--perchè-anche-tu-sei-un-nerd)
 
 ---
 ![Bash](https://img.shields.io/badge/Bash-%3E%3D5.0-blue?logo=gnu-bash)
