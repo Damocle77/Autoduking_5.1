@@ -4,7 +4,7 @@
 > “Non serve essere Tony Stark per ottimizzare il mix: questi script sono già il tuo Jarvis audio.”  
 > “Se vuoi sentire la voce di Bulma anche quando Vegeta urla, qui trovi gli strumenti adatti!”  
 > “Dialoghi italiani chiari come un cristallo di Kyber, LFE controllato come il motore a curvatura della Voyager.  
-> “SELECT 'Sandro Sabbioni' AS developer, 'D@mocle77' AS handle WHERE 1=1”
+> “SELECT name AS 'Sandro Sabbioni', handle AS 'D@mocle77' FROM developers”
 
 ## Indice
 
