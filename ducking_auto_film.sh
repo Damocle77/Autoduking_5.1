@@ -29,7 +29,7 @@ show_spinner() {
 # ==============================================================================
 # INIZIO DELLO SCRIPT PRINCIPALE
 # ==============================================================================
-# ducking_auto_film.sh v1.2 - Audio Cinematografico Ottimizzato
+# ducking_auto_film.sh v1.3 - Audio Cinematografico Ottimizzato
 # Preset auto-adattivo per film con analisi intelligente del mix audio
 #
 # + Analisi LUFS/True Peak completa con valutazione del contenuto
@@ -90,7 +90,7 @@ else
     echo "Profilo Loudness: Bilanciato. Entro le specifiche cinematografiche."
 fi
 echo
-
+# -------------------- ANALISI TRUE PEAK --------------------
 echo "TRUE PEAK ANALYSIS:"
 echo "Input True Peak: $PEAK dBTP"
 if [ $(awk "BEGIN {print ($PEAK > -1) ? 1 : 0}") -eq 1 ]; then
@@ -101,7 +101,7 @@ else
     echo "Condizione Verde: Headroom ottimale. Spazio di manovra abbondante."
 fi
 echo
-
+# -------------------- ANALISI LOUDNESS RANGE --------------------
 echo "DINAMICA E CARATTERISTICHE FILMICHE:"
 echo "Loudness Range: $LRA LU"
 if [ $(awk "BEGIN {print ($LRA < 6) ? 1 : 0}") -eq 1 ]; then
@@ -126,9 +126,9 @@ FX_DUCK_RATIO=2.5
 FX_DUCK_THRESHOLD=0.009
 FRONT_FX_REDUCTION=0.88
 FX_ATTACK=15
-FX_RELEASE=300
+FX_RELEASE=550
 LFE_ATTACK=20
-LFE_RELEASE=350
+LFE_RELEASE=650
 LFE_LP_FREQ=120
 SURROUND_BOOST=1.85
 
@@ -160,9 +160,9 @@ if [ $(awk "BEGIN {print ($PEAK > -1.5 && $LRA > 13) ? 1 : 0}") -eq 1 ]; then
     echo "ENGAGE: Protocollo Anti-Detonazione LFE. Domati i sub-bassi."
 fi
 
-# Filtro pulizia voce italina
-VOICE_EQ="highpass=f=80,deesser,highshelf=f=3500:g=0.5,highshelf=f=10000:g=0.25"
-echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz, highshelf mirato e deesser)."
+# Filtro voce italiana
+VOICE_EQ="highpass=f=80"
+echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz)."
 
 # Regole per film drammatici con dialoghi sommessi
 if [ $(awk "BEGIN {print ($LRA > 18 && $LUFS < -20) ? 1 : 0}") -eq 1 ]; then
@@ -179,7 +179,7 @@ SURROUND_EQ="highpass=f=60,highshelf=f=5000:g=0.25"
 FRONT_FX_EQ="${VOICE_EQ}"
 
 # Riorganizzazione filtri finali
-FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=0.99:limit=0.99"
+FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95"
 LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,${LFE_EQ},volume=${LFE_REDUCTION}"
 LFE_SC_PARAMS="threshold=${LFE_DUCK_THRESHOLD}:ratio=${LFE_DUCK_RATIO}:attack=${LFE_ATTACK}:release=${LFE_RELEASE}:makeup=1.0"
 FX_SC_PARAMS="threshold=${FX_DUCK_THRESHOLD}:ratio=${FX_DUCK_RATIO}:attack=${FX_ATTACK}:release=${FX_RELEASE}:makeup=1.0"

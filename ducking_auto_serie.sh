@@ -11,7 +11,7 @@ cleanup() {
     # Uccide qualsiasi processo ffmpeg di analisi loudnorm rimasto appeso
     pkill -f "ffmpeg.*loudnorm" 2>/dev/null
     exit 130
-} # <-- La funzione cleanup FINISCE QUI.
+}
 
 # Il trap va messo QUI, fuori e dopo la definizione della funzione.
 trap cleanup SIGINT
@@ -25,12 +25,12 @@ show_spinner() {
             sleep 0.1
         done
     done
-} # <-- E anche show_spinner FINISCE QUI, con la sua graffa.
+}
 
 # ==============================================================================
 # INIZIO DELLO SCRIPT PRINCIPALE
 # ==============================================================================
-# ducking_auto_serie.sh v1.2 - Audio Ottimizzato per Serie TV di Genere
+# ducking_auto_serie.sh v1.3 - Audio Ottimizzato per Serie TV di Genere
 #
 # + Analisi LUFS/True Peak completa con valutazione del contenuto
 # + Ottimizzazione adattiva per dialoghi italiani perfettamente intellegibili
@@ -90,7 +90,7 @@ else
     echo "Valutazione: Livello loudness accettabile per contenuto misto"
 fi
 echo
-
+# Echo True Peak
 echo "TRUE PEAK ANALYSIS:"
 echo "Input True Peak: $PEAK dBTP"
 if [ $(awk "BEGIN {print ($PEAK > -1) ? 1 : 0}") -eq 1 ]; then
@@ -101,7 +101,7 @@ else
     echo "Picchi sicuri - headroom adeguato per processing"
 fi
 echo
-
+# Echo Loudness Range (LRA)
 echo "DINAMICA E SOGLIE:"
 echo "Loudness Range: $LRA LU"
 if [ $(awk "BEGIN {print ($LRA < 5) ? 1 : 0}") -eq 1 ]; then
@@ -124,10 +124,10 @@ LFE_DUCK_RATIO=3.5
 FX_DUCK_THRESHOLD=0.012
 FX_DUCK_RATIO=2.5
 FX_ATTACK=15
-FX_RELEASE=300
+FX_RELEASE=600
 FRONT_FX_REDUCTION=0.85
 LFE_ATTACK=20
-LFE_RELEASE=350
+LFE_RELEASE=700
 LFE_HP_FREQ=35
 LFE_LP_FREQ=100
 SURROUND_BOOST=1.75
@@ -150,14 +150,14 @@ elif [ $(awk "BEGIN {print ($LUFS > -16) ? 1 : 0}") -eq 1 ]; then
 else
     echo "APPLICATO: Parametri standard - loudness nel range ottimale"
 fi
-
+# Controllo True Peak per LFE
 if [ $(awk "BEGIN {print ($PEAK > -2) ? 1 : 0}") -eq 1 ]; then
     LFE_HP_FREQ=40
     echo "APPLICATO: Taglio LFE più alto (${LFE_HP_FREQ}Hz) per mix ad alto impatto"
 else
     echo "APPLICATO: Taglio LFE profondo (${LFE_HP_FREQ}Hz) per ambientazioni fantasy/sci-fi"
 fi
-
+# Controllo True Peak per FX
 if [ $(awk "BEGIN {print ($LRA < 5 && $LUFS > -18) ? 1 : 0}") -eq 1 ]; then
     FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.6}")
     FX_RELEASE=$(awk "BEGIN {print $FX_RELEASE - 25}")
@@ -165,25 +165,28 @@ if [ $(awk "BEGIN {print ($LRA < 5 && $LUFS > -18) ? 1 : 0}") -eq 1 ]; then
     echo "APPLICATO: Rilascio ducking più rapido per transizioni fluide"
 fi
 
-# Filtro pulizia voce italina con deesser
-VOICE_EQ="highpass=f=80,deesser,highshelf=f=3500:g=0.5,highshelf=f=10000:g=0.25"
-echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz, highshelf mirato e deesser)."
+# Filtro voce italiana
+VOICE_EQ="highpass=f=80"
+echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz)."
+
 # Filtro LFE cinematografico
 LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=65:width_type=q:w=1.8:g=0.4"
 echo "APPLICATO: LFE cinematografico arioso per definizione e impatto"
 
+# Controllo True Peak per LFE
 if [ $(awk "BEGIN {print ($PEAK > -1.5 && $LRA > 12) ? 1 : 0}") -eq 1 ]; then
     LFE_REDUCTION=$(awk "BEGIN {print $LFE_REDUCTION - 0.12}")
     echo "ATTIVO: Scudi Deflettori alzati! Protezione LFE per picchi da battaglia spaziale."
 fi
 
+# Preparazione filtri
 COMPAND_PARAMS="attacks=0.02:decays=0.05:points=-60/-60|-25/-25|-12/-8:soft-knee=2:gain=0"
 SIDECHAIN_PREP="bandpass=f=1800:width_type=h:w=3000,volume=3.0,compand=${COMPAND_PARAMS},agate=threshold=-38dB:ratio=1.8:attack=2:release=5500"
-#SURROUND_EQ="equalizer=f=180:width_type=q:w=1.8:g=1.1,equalizer=f=2500:width_type=q:w=2.2:g=-1.5,equalizer=f=8000:width_type=q:w=1.5:g=1.2"
 SURROUND_EQ="highpass=f=60,highshelf=f=5000:g=0.25"
 FRONT_FX_EQ="${VOICE_EQ}"
 
-FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=0.99:limit=0.99"
+# Riorganizzazione filtri finali
+FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95"
 LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,${LFE_EQ},volume=${LFE_REDUCTION}"
 LFE_SC_PARAMS="threshold=${LFE_DUCK_THRESHOLD}:ratio=${LFE_DUCK_RATIO}:attack=${LFE_ATTACK}:release=${LFE_RELEASE}:makeup=1.0"
 FX_SC_PARAMS="threshold=${FX_DUCK_THRESHOLD}:ratio=${FX_DUCK_RATIO}:attack=${FX_ATTACK}:release=${FX_RELEASE}:makeup=1.0"
@@ -228,7 +231,7 @@ ffmpeg_exit_code=$?
 duration=$(( $(date +%s) - start_time ))
 minuti=$((duration / 60))
 secondi=$((duration % 60))
-
+# Controllo esito dell'elaborazione
 if [ $ffmpeg_exit_code -eq 0 ]; then
     echo
     echo "==================== ELABORAZIONE COMPLETATA ====================="

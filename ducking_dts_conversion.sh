@@ -1,9 +1,9 @@
 #!/bin/bash
 # ================================================================================
-# ducking_dts_conversion.sh – Conversione traccia audio in DTS 5.1 a 7566k
+# ducking_dts_conversion.sh – Conversione traccia audio in DTS 5.1 a 768k
 # ================================================================================
 # - Copia video e traccia audio originale.
-# - Crea una nuova traccia audio DTS ad alta qualità.
+# - Crea una nuova traccia audio DTS ad alta qualità con +2dB.
 # - Mantiene sottotitoli e metadati del file originale.
 # ================================================================================
 
@@ -11,7 +11,7 @@
 if [ $# -lt 1 ] || [ $# -gt 2 ]; then
     echo "Uso: $0 file_input.mkv [traccia_audio]"
     echo "Esempi:"
-    echo "  $0 file.mkv     # Usa traccia 1 (Clearvoice EAC3)"
+    echo "  $0 file.mkv     # Usa traccia 1 (Clearvoice)"
     echo "  $0 file.mkv 0   # Usa traccia 0 (Originale)"
     echo "  $0 file.mkv 2   # Usa traccia 2 (Ulteriore)"
     exit 1
@@ -19,20 +19,25 @@ fi
 
 # Controllo se il file di input esiste
 INPUT="$1"
-AUDIO_TRACK="${2:-1}"  # Default alla traccia 1 (Clearvoice EAC3)
-BASENAME="${INPUT%.*}"
-OUTPUT="${BASENAME}_dts.mkv"
+# ------------------------------------------------------------------
+# AUTO-DETECT della traccia audio intitolata "Clearvoice"
+# ------------------------------------------------------------------
+if [ -z "$2" ]; then
+  # Cerca tra i flussi audio un tag "title" che contenga "clearvoice"
+  AUDIO_TRACK=$(ffprobe -v error -select_streams a \
+    -show_entries stream=index:stream_tags=title,language \
+    -of csv=p=0 "$INPUT" | \
+    grep -i clearvoice | \
+    cut -d',' -f1)
 
-echo "Conversione traccia audio $AUDIO_TRACK in DTS..."
-
-
-# Esecuzione di ffmpeg per la conversione
-ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT" \
-    -map 0:v -c:v copy \
-    -map 0:a -c:a copy \
-    -map 0:a:$AUDIO_TRACK -c:a:1 dts -ar 48000 -channel_layout:a:1 "5.1(side)" -b:a:1 756k -strict -2 -disposition:a:1 default \
-    -map 0:s? -c:s copy \
-    -map_metadata 0 \
-    -metadata:s:a:1 title="Clearvoice DTS 756k" \
-    "$OUTPUT"
-
+  # Se non trova nulla, ripiega elegantemente sulla traccia 1
+  if [ -z "$AUDIO_TRACK" ]; then
+    echo "⚠️  Nessuna traccia 'Clearvoice' trovata. Uso traccia 1 come fallback."
+    AUDIO_TRACK=1
+  else
+    echo "✅  Trovata traccia Clearvoice: #$AUDIO_TRACK"
+  fi
+else
+  # …altrimenti usa l’indice passato da riga di comando
+  AUDIO_TRACK="$2"
+fi

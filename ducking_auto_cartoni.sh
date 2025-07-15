@@ -11,7 +11,7 @@ cleanup() {
     # Uccide qualsiasi processo ffmpeg di analisi loudnorm rimasto appeso
     pkill -f "ffmpeg.*loudnorm" 2>/dev/null
     exit 130
-} # <-- La funzione cleanup FINISCE QUI.
+}
 
 # Il trap va messo QUI, fuori e dopo la definizione della funzione.
 trap cleanup SIGINT
@@ -25,12 +25,12 @@ show_spinner() {
             sleep 0.1
         done
     done
-} # <-- E anche show_spinner FINISCE QUI, con la sua graffa.
+}
 
 # ==============================================================================
 # INIZIO DELLO SCRIPT PRINCIPALE
 # ==============================================================================
-# ducking_auto_cartoni.sh v1.2 - Audio Ottimizzato per Cartoni e Musical
+# ducking_auto_cartoni.sh v1.3 - Audio Ottimizzato per Cartoni e Musical
 #
 # + Analisi LUFS/True Peak completa con valutazione del contenuto
 # + Ottimizzazione adattiva per dialoghi e voci cantate perfettamente intellegibili
@@ -125,9 +125,9 @@ FX_DUCK_THRESHOLD=0.012
 FRONT_FX_REDUCTION=0.90
 FX_DUCK_RATIO=2.8
 FX_ATTACK=40
-FX_RELEASE=700
+FX_RELEASE=850
 LFE_ATTACK=50
-LFE_RELEASE=900
+LFE_RELEASE=950
 LFE_HP_FREQ=45
 LFE_LP_FREQ=100
 SURROUND_BOOST=1.65
@@ -146,7 +146,7 @@ elif [ $(awk "BEGIN {print ($LUFS > -16) ? 1 : 0}") -eq 1 ]; then
 else
     echo "APPLICATO: Parametri standard - loudness nel range ottimale"
 fi
-
+# Controllo True Peak per LFE
 if [ $(awk "BEGIN {print ($PEAK > -2) ? 1 : 0}") -eq 1 ]; then
     LFE_HP_FREQ=50
     echo "ATTIVO: Filtro 'Anti-Fango' potenziato a ${LFE_HP_FREQ}Hz. Preservata la musicalità, rimosso il rimbombo."
@@ -154,19 +154,22 @@ else
     echo "APPLICATO: Taglio LFE standard (${LFE_HP_FREQ}Hz) per fondamenti orchestrali"
 fi
 
-VOICE_EQ="highpass=f=80,deesser,highshelf=f=3500:g=0.5,highshelf=f=10000:g=0.25"
-echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz, highshelf mirato e deesser)."
+# Filtro voce italiana
+VOICE_EQ="highpass=f=80"
+echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz)."
 
+# Filtro LFE per cartoni
 LFE_EQ="equalizer=f=35:width_type=q:w=1.6:g=0.6,equalizer=f=75:width_type=q:w=1.8:g=0.4"
 echo "ATTIVO: Equalizzazione orchestrale. I bassi sono ora più definiti e musicali, non solo 'boom'."
 
-#SURROUND_EQ="equalizer=f=400:width_type=q:w=2.0:g=1.3,equalizer=f=1800:width_type=q:w=2.4:g=-1.8,equalizer=f=7000:width_type=q:w=2.0:g=2.0"
+# Preparazione filtri
 SURROUND_EQ="highpass=f=60,highshelf=f=5000:g=0.25"
 COMPAND_PARAMS="attacks=0.01:decays=0.02:points=-60/-60|-30/-30|-15/-10:soft-knee=3:gain=0"
 SIDECHAIN_PREP="bandpass=f=2000:width_type=h:w=3600,volume=2.5,compand=${COMPAND_PARAMS},agate=threshold=-35dB:ratio=1.5:attack=1:release=7000"
 FRONT_FX_EQ="${VOICE_EQ}"
 
-FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=0.99:limit=0.99"
+# Riorganizzazione filtri finali
+FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95"
 LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,${LFE_EQ},volume=${LFE_REDUCTION}"
 LFE_SC_PARAMS="threshold=${LFE_DUCK_THRESHOLD}:ratio=${LFE_DUCK_RATIO}:attack=${LFE_ATTACK}:release=${LFE_RELEASE}:makeup=1.0"
 FX_SC_PARAMS="threshold=${FX_DUCK_THRESHOLD}:ratio=${FX_DUCK_RATIO}:attack=${FX_ATTACK}:release=${FX_RELEASE}:makeup=1.0"
