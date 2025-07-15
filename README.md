@@ -51,18 +51,19 @@ Tre preset Bash, ognuno calibrato per un universo diverso. Tutti sfruttano una c
 - **FFmpeg** (>= 7.x con E-AC3, SoxR, Filtercomplex, Audiograph)
 
 ## 📥 Installazione in 30 secondi – “Che la Forza sia con te”
-
 ```
 
 git clone https://github.com/Damocle77/Autoduking_5.1.git
 cd autoducking_5.1
 chmod +x ducking_auto_*.sh
-
 ```
 
-winget install ffmpeg -e \&\& winget install Git.Git -e
+```
+winget install ffmpeg -e && winget install Git.Git -e
 sudo apt install ffmpeg
+sudo yum install ffmpeg
 brew install ffmpeg
+```
 
 ```
 Assicurati che ffmpeg sia nel PATH.
