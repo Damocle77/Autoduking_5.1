@@ -96,9 +96,6 @@ Dimentica filtri distruttivi: qui si usano filtri musicali trasparenti.
 ### Fronte Sonoro Unito
 Canali frontali allineati: nessun “teleport” audio. L’effetto cinema è reale.
 
-### Il De-Esser, arma segreta
-Basta sibilanti fastidiose. Un “cecchino” audio che mira solo alle “S”.
-
 ### Output “Remaster”, non solo “HD”!
 Non si inventa qualità, si tira fuori il massimo dal materiale originale.
 
