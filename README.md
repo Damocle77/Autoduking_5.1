@@ -128,5 +128,4 @@ Non si inventa qualità: si tira fuori il massimo dal materiale originale.
 
 ---
 
-> Se ti perdi i dialoghi perché i bassi fanno a botte con l’Enterprise, questi script sono la tua alleanza ribelle.  
 > “Per riportare equilibrio nella Forza ti servono solo un terminale bash e questi script!”
