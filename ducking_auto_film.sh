@@ -44,7 +44,7 @@ show_spinner() {
 # Controllo argomenti
 INPUT_FILE="$1"
 OUTPUT_FILE="${INPUT_FILE%.*}_film_ducked.mkv"
-BITRATE="640k"
+BITRATE="768k"
 [ ! -z "$2" ] && BITRATE="$2"
 
 if [ -z "$INPUT_FILE" ]; then
@@ -161,8 +161,8 @@ if [ $(awk "BEGIN {print ($PEAK > -1.5 && $LRA > 13) ? 1 : 0}") -eq 1 ]; then
 fi
 
 # Filtro voce italiana
-VOICE_EQ="highpass=f=80"
-echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz)."
+VOICE_EQ="highpass=f=80,lowpass=f=4000:poles=1"
+echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz, low-pass 4000Hz)."
 
 # Regole per film drammatici con dialoghi sommessi
 if [ $(awk "BEGIN {print ($LRA > 18 && $LUFS < -20) ? 1 : 0}") -eq 1 ]; then
@@ -174,12 +174,11 @@ fi
 COMPAND_PARAMS="attacks=0.02:decays=0.05:points=-60/-60|-25/-25|-12/-8:soft-knee=2:gain=0"
 SIDECHAIN_PREP="bandpass=f=1800:width_type=h:w=3000,volume=3.0,compand=${COMPAND_PARAMS},agate=threshold=-38dB:ratio=1.8:attack=2:release=5000"
 LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=65:width_type=q:w=1.8:g=0.4"
-#SURROUND_EQ="equalizer=f=180:width_type=q:w=1.8:g=1.1,equalizer=f=2500:width_type=q:w=2.2:g=-1.5,equalizer=f=8000:width_type=q:w=1.5:g=1.2"
-SURROUND_EQ="highpass=f=60,highshelf=f=5000:g=0.25"
-FRONT_FX_EQ="${VOICE_EQ}"
+SURROUND_EQ="highpass=f=60"
+FRONT_FX_EQ="highpass=f=80"
 
 # Riorganizzazione filtri finali
-FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95"
+FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95:attack=20:release=150"
 LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,${LFE_EQ},volume=${LFE_REDUCTION}"
 LFE_SC_PARAMS="threshold=${LFE_DUCK_THRESHOLD}:ratio=${LFE_DUCK_RATIO}:attack=${LFE_ATTACK}:release=${LFE_RELEASE}:makeup=1.0"
 FX_SC_PARAMS="threshold=${FX_DUCK_THRESHOLD}:ratio=${FX_DUCK_RATIO}:attack=${FX_ATTACK}:release=${FX_RELEASE}:makeup=1.0"

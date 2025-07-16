@@ -120,11 +120,11 @@ echo "RACCOMANDAZIONI AUTOMATICHE SERIE TV:"
 VOICE_BOOST=3.5
 LFE_REDUCTION=0.75
 LFE_DUCK_THRESHOLD=0.006
-LFE_DUCK_RATIO=3.5
+LFE_DUCK_RATIO=2.5
 FX_DUCK_THRESHOLD=0.012
-FX_DUCK_RATIO=2.5
-FX_ATTACK=15
-FX_RELEASE=600
+FX_DUCK_RATIO=1.8
+FX_ATTACK=25
+FX_RELEASE=800
 FRONT_FX_REDUCTION=0.85
 LFE_ATTACK=20
 LFE_RELEASE=700
@@ -166,8 +166,8 @@ if [ $(awk "BEGIN {print ($LRA < 5 && $LUFS > -18) ? 1 : 0}") -eq 1 ]; then
 fi
 
 # Filtro voce italiana
-VOICE_EQ="highpass=f=80"
-echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz)."
+VOICE_EQ="highpass=f=80,lowpass=f=4000:poles=1"
+echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz, low-pass 4000Hz)."
 
 # Filtro LFE cinematografico
 LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=65:width_type=q:w=1.8:g=0.4"
@@ -180,13 +180,13 @@ if [ $(awk "BEGIN {print ($PEAK > -1.5 && $LRA > 12) ? 1 : 0}") -eq 1 ]; then
 fi
 
 # Preparazione filtri
-COMPAND_PARAMS="attacks=0.02:decays=0.05:points=-60/-60|-25/-25|-12/-8:soft-knee=2:gain=0"
-SIDECHAIN_PREP="bandpass=f=1800:width_type=h:w=3000,volume=3.0,compand=${COMPAND_PARAMS},agate=threshold=-38dB:ratio=1.8:attack=2:release=5500"
-SURROUND_EQ="highpass=f=60,highshelf=f=5000:g=0.25"
-FRONT_FX_EQ="${VOICE_EQ}"
+COMPAND_PARAMS="attacks=0.05:decays=0.1:points=-60/-60|-25/-25|-12/-10:soft-knee=3:gain=0"
+SIDECHAIN_PREP="bandpass=f=1800:width_type=h:w=3000,volume=2.8,compand=${COMPAND_PARAMS},agate=threshold=-35dB:ratio=1.5:attack=3:release=6000"
+SURROUND_EQ="highpass=f=60"
+FRONT_FX_EQ="highpass=f=80"
 
 # Riorganizzazione filtri finali
-FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95"
+FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95:attack=20:release=150"
 LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,${LFE_EQ},volume=${LFE_REDUCTION}"
 LFE_SC_PARAMS="threshold=${LFE_DUCK_THRESHOLD}:ratio=${LFE_DUCK_RATIO}:attack=${LFE_ATTACK}:release=${LFE_RELEASE}:makeup=1.0"
 FX_SC_PARAMS="threshold=${FX_DUCK_THRESHOLD}:ratio=${FX_DUCK_RATIO}:attack=${FX_ATTACK}:release=${FX_RELEASE}:makeup=1.0"

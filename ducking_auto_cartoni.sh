@@ -44,7 +44,7 @@ show_spinner() {
 # Controllo argomenti
 INPUT_FILE="$1"
 OUTPUT_FILE="${INPUT_FILE%.*}_cartoon_ducked.mkv"
-BITRATE="640k"
+BITRATE="768k"
 [ ! -z "$2" ] && BITRATE="$2"
 
 if [ -z "$INPUT_FILE" ]; then
@@ -155,21 +155,21 @@ else
 fi
 
 # Filtro voce italiana
-VOICE_EQ="highpass=f=80"
-echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz)."
+VOICE_EQ="highpass=f=80,lowpass=f=4000:poles=1"
+echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz, low-pass 4000Hz)."
 
 # Filtro LFE per cartoni
 LFE_EQ="equalizer=f=35:width_type=q:w=1.6:g=0.6,equalizer=f=75:width_type=q:w=1.8:g=0.4"
 echo "ATTIVO: Equalizzazione orchestrale. I bassi sono ora più definiti e musicali, non solo 'boom'."
 
 # Preparazione filtri
-SURROUND_EQ="highpass=f=60,highshelf=f=5000:g=0.25"
 COMPAND_PARAMS="attacks=0.01:decays=0.02:points=-60/-60|-30/-30|-15/-10:soft-knee=3:gain=0"
 SIDECHAIN_PREP="bandpass=f=2000:width_type=h:w=3600,volume=2.5,compand=${COMPAND_PARAMS},agate=threshold=-35dB:ratio=1.5:attack=1:release=7000"
-FRONT_FX_EQ="${VOICE_EQ}"
+SURROUND_EQ="highpass=f=60"
+FRONT_FX_EQ="highpass=f=80" 
 
 # Riorganizzazione filtri finali
-FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95"
+FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95:attack=20:release=150"
 LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,${LFE_EQ},volume=${LFE_REDUCTION}"
 LFE_SC_PARAMS="threshold=${LFE_DUCK_THRESHOLD}:ratio=${LFE_DUCK_RATIO}:attack=${LFE_ATTACK}:release=${LFE_RELEASE}:makeup=1.0"
 FX_SC_PARAMS="threshold=${FX_DUCK_THRESHOLD}:ratio=${FX_DUCK_RATIO}:attack=${FX_ATTACK}:release=${FX_RELEASE}:makeup=1.0"
