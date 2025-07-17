@@ -130,7 +130,7 @@ LFE_ATTACK=50
 LFE_RELEASE=950
 LFE_HP_FREQ=45
 LFE_LP_FREQ=100
-SURROUND_BOOST=1.65
+SURROUND_BOOST=1.75
 
 # -------------------- LOGICA ADATTIVA --------------------
 if [ $(awk "BEGIN {print ($LUFS < -20) ? 1 : 0}") -eq 1 ]; then
@@ -155,7 +155,7 @@ else
 fi
 
 # Filtro voce italiana
-VOICE_EQ="highpass=f=80,lowpass=f=4000:poles=1"
+VOICE_EQ="highpass=f=85,lowpass=f=4000:poles=1"
 echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz, low-pass 4000Hz)."
 
 # Filtro LFE per cartoni
@@ -166,10 +166,10 @@ echo "ATTIVO: Equalizzazione orchestrale. I bassi sono ora più definiti e music
 COMPAND_PARAMS="attacks=0.01:decays=0.02:points=-60/-60|-30/-30|-15/-10:soft-knee=3:gain=0"
 SIDECHAIN_PREP="bandpass=f=2000:width_type=h:w=3600,volume=2.5,compand=${COMPAND_PARAMS},agate=threshold=-35dB:ratio=1.5:attack=1:release=7000"
 SURROUND_EQ="highpass=f=60"
-FRONT_FX_EQ="highpass=f=80" 
+FRONT_FX_EQ="highpass=f=85" 
 
 # Riorganizzazione filtri finali
-FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95:attack=20:release=150"
+FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.98:attack=40:release=300:asc=1"
 LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,${LFE_EQ},volume=${LFE_REDUCTION}"
 LFE_SC_PARAMS="threshold=${LFE_DUCK_THRESHOLD}:ratio=${LFE_DUCK_RATIO}:attack=${LFE_ATTACK}:release=${LFE_RELEASE}:makeup=1.0"
 FX_SC_PARAMS="threshold=${FX_DUCK_THRESHOLD}:ratio=${FX_DUCK_RATIO}:attack=${FX_ATTACK}:release=${FX_RELEASE}:makeup=1.0"

@@ -117,7 +117,7 @@ echo
 
 echo "RACCOMANDAZIONI AUTOMATICHE SERIE TV:"
 # Parametri base (preset serie genere)
-VOICE_BOOST=3.5
+VOICE_BOOST=3.4
 LFE_REDUCTION=0.75
 LFE_DUCK_THRESHOLD=0.006
 LFE_DUCK_RATIO=2.5
@@ -166,7 +166,7 @@ if [ $(awk "BEGIN {print ($LRA < 5 && $LUFS > -18) ? 1 : 0}") -eq 1 ]; then
 fi
 
 # Filtro voce italiana
-VOICE_EQ="highpass=f=80,lowpass=f=4000:poles=1"
+VOICE_EQ="highpass=f=85,lowpass=f=4000:poles=1"
 echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz, low-pass 4000Hz)."
 
 # Filtro LFE cinematografico
@@ -183,10 +183,10 @@ fi
 COMPAND_PARAMS="attacks=0.05:decays=0.1:points=-60/-60|-25/-25|-12/-10:soft-knee=3:gain=0"
 SIDECHAIN_PREP="bandpass=f=1800:width_type=h:w=3000,volume=2.8,compand=${COMPAND_PARAMS},agate=threshold=-35dB:ratio=1.5:attack=3:release=6000"
 SURROUND_EQ="highpass=f=60"
-FRONT_FX_EQ="highpass=f=80"
+FRONT_FX_EQ="highpass=f=85"
 
 # Riorganizzazione filtri finali
-FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95:attack=20:release=150"
+FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.98:attack=40:release=300:asc=1"
 LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,${LFE_EQ},volume=${LFE_REDUCTION}"
 LFE_SC_PARAMS="threshold=${LFE_DUCK_THRESHOLD}:ratio=${LFE_DUCK_RATIO}:attack=${LFE_ATTACK}:release=${LFE_RELEASE}:makeup=1.0"
 FX_SC_PARAMS="threshold=${FX_DUCK_THRESHOLD}:ratio=${FX_DUCK_RATIO}:attack=${FX_ATTACK}:release=${FX_RELEASE}:makeup=1.0"

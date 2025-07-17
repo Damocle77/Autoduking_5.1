@@ -125,8 +125,8 @@ LFE_DUCK_RATIO=3.5
 FX_DUCK_RATIO=2.5
 FX_DUCK_THRESHOLD=0.009
 FRONT_FX_REDUCTION=0.88
-FX_ATTACK=15
-FX_RELEASE=550
+FX_ATTACK=30
+FX_RELEASE=750
 LFE_ATTACK=20
 LFE_RELEASE=650
 LFE_LP_FREQ=120
@@ -161,7 +161,7 @@ if [ $(awk "BEGIN {print ($PEAK > -1.5 && $LRA > 13) ? 1 : 0}") -eq 1 ]; then
 fi
 
 # Filtro voce italiana
-VOICE_EQ="highpass=f=80,lowpass=f=4000:poles=1"
+VOICE_EQ="highpass=f=85,lowpass=f=4000:poles=1"
 echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz, low-pass 4000Hz)."
 
 # Regole per film drammatici con dialoghi sommessi
@@ -175,10 +175,10 @@ COMPAND_PARAMS="attacks=0.02:decays=0.05:points=-60/-60|-25/-25|-12/-8:soft-knee
 SIDECHAIN_PREP="bandpass=f=1800:width_type=h:w=3000,volume=3.0,compand=${COMPAND_PARAMS},agate=threshold=-38dB:ratio=1.8:attack=2:release=5000"
 LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=65:width_type=q:w=1.8:g=0.4"
 SURROUND_EQ="highpass=f=60"
-FRONT_FX_EQ="highpass=f=80"
+FRONT_FX_EQ="highpass=f=85"
 
 # Riorganizzazione filtri finali
-FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95:attack=20:release=150"
+FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.98:attack=40:release=300:asc=1"
 LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,${LFE_EQ},volume=${LFE_REDUCTION}"
 LFE_SC_PARAMS="threshold=${LFE_DUCK_THRESHOLD}:ratio=${LFE_DUCK_RATIO}:attack=${LFE_ATTACK}:release=${LFE_RELEASE}:makeup=1.0"
 FX_SC_PARAMS="threshold=${FX_DUCK_THRESHOLD}:ratio=${FX_DUCK_RATIO}:attack=${FX_ATTACK}:release=${FX_RELEASE}:makeup=1.0"
