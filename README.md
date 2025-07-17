@@ -120,7 +120,7 @@ Non si inventa qualità: si tira fuori il massimo dal materiale originale.
 ## Perché usarli
 > 🧑‍🚀 Perché anche tu sei un Nerd!
 
-- Analisi automatica loudness: è come avere **DATA** che ti monitora il segnale.
+- Analisi automatica loudness: è come avere **DATA** che monitora il segnale.
 - Dialoghi italiani sempre intelligibili.
 - Output EAC3 e DTS robustissimi.
 - Alchimie ducking/LFE dedicate a ogni genere.
