@@ -121,7 +121,7 @@ Non si inventa qualità: si tira fuori il massimo dal materiale originale.
 > 🧑‍🚀 Perché anche tu sei un Nerd!
 
 - Analisi automatica loudness: è come avere **DATA** che ti monitora il segnale.
-- Dialoghi italiani sempre intelligibili, anche nei mix più “lucasiani”.
+- Dialoghi italiani sempre intelligibili.
 - Output EAC3 e DTS robustissimi.
 - Alchimie ducking/LFE dedicate a ogni genere.
 - Tutto open source e facilmente editabile.
