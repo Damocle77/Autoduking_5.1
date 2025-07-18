@@ -1,18 +1,19 @@
 #!/bin/bash
-
 # ==============================================================================
-# DEFINIZIONE FUNZIONI E TRAP
+# DEFINIZIONE FUNZIONI & TRAP
 # ==============================================================================
 
 # Funzione di pulizia per gestire Ctrl+C
 cleanup() {
     echo -e "\n\nScript interrotto. Eseguo pulizia processi..."
+    # Se lo spinner è attivo, lo killa
     [ ! -z "$SPIN_PID" ] && kill $SPIN_PID 2>/dev/null
+    # Uccide qualsiasi processo ffmpeg di analisi loudnorm rimasto appeso
     pkill -f "ffmpeg.*loudnorm" 2>/dev/null
     exit 130
-} # <-- Chiusura corretta di cleanup
+}
 
-# Il trap va messo QUI, fuori e dopo la definizione
+# Il trap va messo QUI, fuori e dopo la definizione della funzione.
 trap cleanup SIGINT
 
 # Funzione per lo spinner
@@ -24,19 +25,18 @@ show_spinner() {
             sleep 0.1
         done
     done
-} # <-- Chiusura corretta di show_spinner
-
+}
 # ==============================================================================
 # INIZIO DELLO SCRIPT PRINCIPALE
 # ==============================================================================
-# ducking_auto_film.sh v1.3 - Audio Cinematografico Ottimizzato
+# ducking_auto_film.sh v1.5 - Audio Cinematografico Ottimizzato
 # Preset auto-adattivo per film con analisi intelligente del mix audio
 #
 # + Analisi LUFS/True Peak completa con valutazione del contenuto
 # + Ottimizzazione adattiva per dialoghi italiani perfettamente intellegibili
 # + Ducking dinamico per bilanciare voce, effetti e LFE in tempo reale
 # + Calibrato per film d'azione, thriller, drammatici e horror
-# + EQ specializzato per voce italiana (200-3500Hz) e bassi cinematografici
+# + Ottimizzazione per la voce italiana e bassi cinematografici
 # + Protezione anti-scoppio per LFE nei mix con ampia dinamica
 # + Ideale per basso volume su soundbar LG Meridian SP7 + RPK8
 # ==============================================================================
@@ -117,33 +117,41 @@ echo
 
 # -------------------- LOGICA ADATTIVA --------------------
 echo "RACCOMANDAZIONI AUTOMATICHE CINEMATOGRAFICHE:"
-# Parametri base per film cinematografici
+# Parametri base per film cinematografici - DUCKING REATTIVO E SICURO
+# NB. (LFE_REDUCTION=0.77 -> ridotto del 23%)
 VOICE_BOOST=3.5
-LFE_REDUCTION=0.75
-LFE_DUCK_THRESHOLD=0.005
-LFE_DUCK_RATIO=3.5
-FX_DUCK_RATIO=2.5
-FX_DUCK_THRESHOLD=0.009
-FRONT_FX_REDUCTION=0.88
-FX_ATTACK=30
-FX_RELEASE=750
-LFE_ATTACK=20
-LFE_RELEASE=650
+LFE_REDUCTION=0.76
+LFE_DUCK_THRESHOLD=0.003
+LFE_DUCK_RATIO=4.0
+FX_DUCK_RATIO=2.6
+FX_DUCK_THRESHOLD=0.006
+FRONT_FX_REDUCTION=0.90
+FX_ATTACK=20
+FX_RELEASE=600
+LFE_ATTACK=15
+LFE_RELEASE=550
 LFE_LP_FREQ=120
 SURROUND_BOOST=1.85
-
+MAKEUP_GAIN=5.5
+# NB. (MAKUP_GAIN aumentato necessita di riduzione del limiter su FINAL_FILTER)
 # Regole adattive per gestire al meglio i mix aggressivi
 if [ $(awk "BEGIN {print ($LUFS > -14) ? 1 : 0}") -eq 1 ]; then
-    LFE_DUCK_RATIO=$(awk "BEGIN {print $LFE_DUCK_RATIO + 0.8}")
-    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.5}")
-    LFE_REDUCTION=$(awk "BEGIN {print $LFE_REDUCTION - 0.1}")
-    echo "ATTIVO: Protocollo 'Mix Aggressivo'. Potenziati i campi di contenimento (ducking)."
+    LFE_DUCK_RATIO=$(awk "BEGIN {print $LFE_DUCK_RATIO + 0.6}")
+    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.4}")
+    LFE_REDUCTION=$(awk "BEGIN {print $LFE_REDUCTION - 0.05}")
+    MAKEUP_GAIN=$(awk "BEGIN {print $MAKEUP_GAIN + 0.9}")
+    echo "ATTIVO: Protocollo 'Mix Esplosivo'. Ducking potenziato per scene d'azione intense."
+    echo "APPLICATO: Makeup gain extra (+0.9) per compensare riduzioni"
 elif [ $(awk "BEGIN {print ($LUFS < -20) ? 1 : 0}") -eq 1 ]; then
-    VOICE_BOOST=$(awk "BEGIN {print $VOICE_BOOST + 0.4}")
-    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.7}")
-    echo "APPLICATO: Audio conservativo - boost dialoghi aumentato."
+    VOICE_BOOST=$(awk "BEGIN {print $VOICE_BOOST + 0.1}")
+    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.3}")
+    LFE_DUCK_RATIO=$(awk "BEGIN {print $LFE_DUCK_RATIO + 0.4}")
+    MAKEUP_GAIN=$(awk "BEGIN {print $MAKEUP_GAIN + 1.1}")
+    echo "APPLICATO: Audio conservativo - boost dialoghi minimo e ducking rinforzato."
+    echo "APPLICATO: Makeup gain sostanzioso (+1.1) per volume finale ottimale"
 else
-    echo "APPLICATO: Parametri cinema standard - mix bilanciato."
+    echo "APPLICATO: Parametri cinema bilanciati - ducking efficace per fantasy/sci-fi."
+    echo "APPLICATO: Makeup gain principale (${MAKEUP_GAIN}) per volume finale corretto"
 fi
 
 # Regole adattive per LFE
@@ -160,9 +168,9 @@ if [ $(awk "BEGIN {print ($PEAK > -1.5 && $LRA > 13) ? 1 : 0}") -eq 1 ]; then
     echo "ENGAGE: Protocollo Anti-Detonazione LFE. Domati i sub-bassi."
 fi
 
-# Filtro voce italiana
-VOICE_EQ="highpass=f=85,lowpass=f=4000:poles=1"
-echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz, low-pass 4000Hz)."
+# Filtro voce italiana con De-Esser
+VOICE_EQ="highpass=f=85,deesser=i=0.12:m=0.4:f=0.23"
+echo "APPLICATO: Filtro pulizia voce High-pass 85Hz + De-Esser per controllo sibilanti."
 
 # Regole per film drammatici con dialoghi sommessi
 if [ $(awk "BEGIN {print ($LRA > 18 && $LUFS < -20) ? 1 : 0}") -eq 1 ]; then
@@ -171,18 +179,18 @@ if [ $(awk "BEGIN {print ($LRA > 18 && $LUFS < -20) ? 1 : 0}") -eq 1 ]; then
 fi
 
 # Preparazione filtri
-COMPAND_PARAMS="attacks=0.02:decays=0.05:points=-60/-60|-25/-25|-12/-8:soft-knee=2:gain=0"
-SIDECHAIN_PREP="bandpass=f=1800:width_type=h:w=3000,volume=3.0,compand=${COMPAND_PARAMS},agate=threshold=-38dB:ratio=1.8:attack=2:release=5000"
-LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=65:width_type=q:w=1.8:g=0.4"
-SURROUND_EQ="highpass=f=60"
+COMPAND_PARAMS="attacks=0.01:decays=0.03:points=-60/-60|-25/-25|-12/-8:soft-knee=2:gain=0"
+SIDECHAIN_PREP="bandpass=f=1900:width_type=h:w=3200,volume=3.1,compand=${COMPAND_PARAMS},agate=threshold=-30dB:ratio=2.0:attack=1:release=5000"
+LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=70:width_type=q:w=1.8:g=0.5"
+SURROUND_EQ="highpass=f=60,volume=1.06" # +0.5dB Boost
 FRONT_FX_EQ="highpass=f=85"
 
 # Riorganizzazione filtri finali
-FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.98:attack=40:release=300:asc=1"
+FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.97:attack=45:release=350:asc=1"
 LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,${LFE_EQ},volume=${LFE_REDUCTION}"
 LFE_SC_PARAMS="threshold=${LFE_DUCK_THRESHOLD}:ratio=${LFE_DUCK_RATIO}:attack=${LFE_ATTACK}:release=${LFE_RELEASE}:makeup=1.0"
 FX_SC_PARAMS="threshold=${FX_DUCK_THRESHOLD}:ratio=${FX_DUCK_RATIO}:attack=${FX_ATTACK}:release=${FX_RELEASE}:makeup=1.0"
-FINAL_FILTER="aresample=resampler=soxr:precision=28:cutoff=0.95:cheby=1,aformat=channel_layouts=5.1"
+FINAL_FILTER="aresample=resampler=soxr:precision=28:cutoff=0.95:cheby=1,volume=${MAKEUP_GAIN},alimiter=level_in=1:level_out=1:limit=0.94:attack=35:release=400:asc=1,aformat=channel_layouts=5.1"
 
 # -------------------- ESECUZIONE FFMPEG --------------------
 echo
@@ -204,8 +212,8 @@ ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
 [FR]${FRONT_FX_EQ}[FR_eq]; \
 [FR_eq][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FR_comp]; \
 [FR_comp]volume=${FRONT_FX_REDUCTION}[FRduck]; \
-[SL]volume=${SURROUND_BOOST},${SURROUND_EQ}[SLduck]; \
-[SR]volume=${SURROUND_BOOST},${SURROUND_EQ}[SRduck]; \
+[SL]${SURROUND_EQ}[SLduck]; \
+[SR]${SURROUND_EQ}[SRduck]; \
 [FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}[clearvoice]" \
 -map 0:v -c:v copy \
 -map "[clearvoice]" -c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice EAC3 Film" \
@@ -234,6 +242,7 @@ if [ $ffmpeg_exit_code -eq 0 ]; then
     echo "PARAMETRI FINALI APPLICATI:"
     echo "Voice Boost: $VOICE_BOOST dB | LFE Reduction: $LFE_REDUCTION"
     echo "FX Duck Ratio: $FX_DUCK_RATIO:1 | LFE Duck Ratio: $LFE_DUCK_RATIO:1"
+    echo "Makeup Gain: $MAKEUP_GAIN | Limiter finale ottimizzato: 0.94"
     echo
     echo "MISURAZIONE ORIGINALE:"
     echo "LUFS: $LUFS | True Peak: $PEAK dBTP | LRA: $LRA LU"

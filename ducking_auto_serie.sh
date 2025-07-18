@@ -30,13 +30,13 @@ show_spinner() {
 # ==============================================================================
 # INIZIO DELLO SCRIPT PRINCIPALE
 # ==============================================================================
-# ducking_auto_serie.sh v1.3 - Audio Ottimizzato per Serie TV di Genere
+# ducking_auto_serie.sh v1.5 - Audio Ottimizzato per Serie TV di Genere
 #
 # + Analisi LUFS/True Peak completa con valutazione del contenuto
 # + Ottimizzazione adattiva per dialoghi italiani perfettamente intellegibili
 # + Ducking dinamico per bilanciare voce, effetti e LFE in tempo reale
 # + Calibrato per serie fantascienza, fantasy, horror e thriller
-# + EQ specializzato per voce italiana e bassi cinematografici
+# + Ottimizzazione per la voce italiana e bassi cinematograficie
 # + Protezione anti-distorsione per mix con effetti intensi
 # + Ideale per basso volume su soundbar LG Meridian SP7 + RPK8
 # ==============================================================================
@@ -116,39 +116,43 @@ echo "Target Offset: $TARGET_OFFSET LU"
 echo
 
 echo "RACCOMANDAZIONI AUTOMATICHE SERIE TV:"
-# Parametri base (preset serie genere)
-VOICE_BOOST=3.4
+# Parametri base (preset serie genere) - DUCKING REATTIVO E SICURO
+# NB. (LFE_REDUCTION=0.77 -> ridotto del 23%)
+VOICE_BOOST=3.5
 LFE_REDUCTION=0.75
-LFE_DUCK_THRESHOLD=0.006
-LFE_DUCK_RATIO=2.5
-FX_DUCK_THRESHOLD=0.012
-FX_DUCK_RATIO=1.8
-FX_ATTACK=25
-FX_RELEASE=800
-FRONT_FX_REDUCTION=0.85
-LFE_ATTACK=20
-LFE_RELEASE=700
+LFE_DUCK_THRESHOLD=0.004
+LFE_DUCK_RATIO=2.8
+FX_DUCK_THRESHOLD=0.007
+FX_DUCK_RATIO=2.0
+FX_ATTACK=20
+FX_RELEASE=650
+FRONT_FX_REDUCTION=0.90
+LFE_ATTACK=15
+LFE_RELEASE=600
 LFE_HP_FREQ=35
 LFE_LP_FREQ=100
 SURROUND_BOOST=1.75
-
+MAKEUP_GAIN=5.3
+# NB. (MAKUP_GAIN aumentato necessita di riduzione del limiter su FINAL_FILTER)
 # -------------------- LOGICA ADATTIVA --------------------
 if [ $(awk "BEGIN {print ($LUFS < -20) ? 1 : 0}") -eq 1 ]; then
-    VOICE_BOOST=$(awk "BEGIN {print $VOICE_BOOST + 0.3}")
-    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.5}")
-    LFE_DUCK_RATIO=$(awk "BEGIN {print $LFE_DUCK_RATIO + 0.4}")
-    echo "APPLICATO: Boost dialogo (+0.3dB) per compensare audio debole"
-    echo "APPLICATO: Ducking più aggressivo (FX +0.5, LFE +0.4) per chiarezza"
+    VOICE_BOOST=$(awk "BEGIN {print $VOICE_BOOST + 0.1}")
+    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.3}")
+    LFE_DUCK_RATIO=$(awk "BEGIN {print $LFE_DUCK_RATIO + 0.3}")
+    MAKEUP_GAIN=$(awk "BEGIN {print $MAKEUP_GAIN + 1.0}")
+    echo "APPLICATO: Boost dialogo minimo (+0.1dB) per preservare bilanciamento stereo"
+    echo "APPLICATO: Ducking aumentato (FX +0.3, LFE +0.3) per chiarezza"
+    echo "APPLICATO: Makeup gain sostanzioso (+1.0) per volume finale ottimale"
 elif [ $(awk "BEGIN {print ($LUFS > -16) ? 1 : 0}") -eq 1 ]; then
-    VOICE_BOOST=$(awk "BEGIN {print $VOICE_BOOST - 0.2}")
-    LFE_REDUCTION=$(awk "BEGIN {print $LFE_REDUCTION - 0.07}")
-    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.5}")
-    LFE_DUCK_RATIO=$(awk "BEGIN {print $LFE_DUCK_RATIO + 0.5}")
-    echo "APPLICATO: Riduzione boost dialogo (-0.2dB) per audio già forte"
-    echo "APPLICATO: LFE più ridotto (-0.07) per bilanciare il mix"
+    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.3}")
+    LFE_DUCK_RATIO=$(awk "BEGIN {print $LFE_DUCK_RATIO + 0.3}")
+    MAKEUP_GAIN=$(awk "BEGIN {print $MAKEUP_GAIN + 0.8}")
+    echo "APPLICATO: Voice boost invariato per preservare bilanciamento"
     echo "APPLICATO: Ducking rinforzato per mix ultra-compresso"
+    echo "APPLICATO: Makeup gain potenziato (+0.8) per livello finale corretto"
 else
-    echo "APPLICATO: Parametri standard - loudness nel range ottimale"
+    echo "APPLICATO: Parametri standard bilanciati - loudness nel range ottimale"
+    echo "APPLICATO: Makeup gain principale (${MAKEUP_GAIN}) per volume finale corretto"
 fi
 # Controllo True Peak per LFE
 if [ $(awk "BEGIN {print ($PEAK > -2) ? 1 : 0}") -eq 1 ]; then
@@ -165,9 +169,9 @@ if [ $(awk "BEGIN {print ($LRA < 5 && $LUFS > -18) ? 1 : 0}") -eq 1 ]; then
     echo "APPLICATO: Rilascio ducking più rapido per transizioni fluide"
 fi
 
-# Filtro voce italiana
-VOICE_EQ="highpass=f=85,lowpass=f=4000:poles=1"
-echo "APPLICATO: Filtro pulizia voce italiana (High-pass 80Hz, low-pass 4000Hz)."
+# Filtro voce italiana con De-Esser
+VOICE_EQ="highpass=f=85,deesser=i=0.12:m=0.4:f=0.23"
+echo "APPLICATO: Filtro pulizia voce High-pass 85Hz + De-Esser per controllo sibilanti."
 
 # Filtro LFE cinematografico
 LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=65:width_type=q:w=1.8:g=0.4"
@@ -180,17 +184,17 @@ if [ $(awk "BEGIN {print ($PEAK > -1.5 && $LRA > 12) ? 1 : 0}") -eq 1 ]; then
 fi
 
 # Preparazione filtri
-COMPAND_PARAMS="attacks=0.05:decays=0.1:points=-60/-60|-25/-25|-12/-10:soft-knee=3:gain=0"
-SIDECHAIN_PREP="bandpass=f=1800:width_type=h:w=3000,volume=2.8,compand=${COMPAND_PARAMS},agate=threshold=-35dB:ratio=1.5:attack=3:release=6000"
-SURROUND_EQ="highpass=f=60"
+COMPAND_PARAMS="attacks=0.02:decays=0.05:points=-60/-60|-25/-25|-12/-8:soft-knee=2:gain=0"
+SIDECHAIN_PREP="bandpass=f=1900:width_type=h:w=3200,volume=2.9,compand=${COMPAND_PARAMS},agate=threshold=-32dB:ratio=1.8:attack=1.5:release=5500"
+SURROUND_EQ="highpass=f=60,volume=1.06" # +0.5dB Boost
 FRONT_FX_EQ="highpass=f=85"
 
 # Riorganizzazione filtri finali
-FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.98:attack=40:release=300:asc=1"
+FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.97:attack=45:release=350:asc=1"
 LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,${LFE_EQ},volume=${LFE_REDUCTION}"
 LFE_SC_PARAMS="threshold=${LFE_DUCK_THRESHOLD}:ratio=${LFE_DUCK_RATIO}:attack=${LFE_ATTACK}:release=${LFE_RELEASE}:makeup=1.0"
 FX_SC_PARAMS="threshold=${FX_DUCK_THRESHOLD}:ratio=${FX_DUCK_RATIO}:attack=${FX_ATTACK}:release=${FX_RELEASE}:makeup=1.0"
-FINAL_FILTER="aresample=resampler=soxr:precision=28:cutoff=0.95:cheby=1,aformat=channel_layouts=5.1"
+FINAL_FILTER="aresample=resampler=soxr:precision=28:cutoff=0.95:cheby=1,volume=${MAKEUP_GAIN},alimiter=level_in=1:level_out=1:limit=0.94:attack=35:release=400:asc=1,aformat=channel_layouts=5.1"
 
 # -------------------- ESECUZIONE FFMPEG --------------------
 echo
@@ -212,8 +216,8 @@ ffmpeg -y -nostdin -hwaccel auto -threads 0 -i "$INPUT_FILE" -filter_complex \
 [FR]${FRONT_FX_EQ}[FR_eq]; \
 [FR_eq][FCsidechain]sidechaincompress=${FX_SC_PARAMS}[FR_comp]; \
 [FR_comp]volume=${FRONT_FX_REDUCTION}[FRduck]; \
-[SL]volume=${SURROUND_BOOST},${SURROUND_EQ}[SLduck]; \
-[SR]volume=${SURROUND_BOOST},${SURROUND_EQ}[SRduck]; \
+[SL]${SURROUND_EQ}[SLduck]; \
+[SR]${SURROUND_EQ}[SRduck]; \
 [FLduck][FRduck][FCout][LFEduck][SLduck][SRduck]amerge=inputs=6,${FINAL_FILTER}[clearvoice]" \
 -map 0:v -c:v copy \
 -map "[clearvoice]" -c:a:0 eac3 -b:a:0 ${BITRATE} -metadata:s:a:0 language=ita -metadata:s:a:0 title="Clearvoice EAC3 Serie" \
@@ -242,6 +246,7 @@ if [ $ffmpeg_exit_code -eq 0 ]; then
     echo "PARAMETRI FINALI APPLICATI:"
     echo "Voice Boost: $VOICE_BOOST dB | LFE Reduction: $LFE_REDUCTION"
     echo "FX Duck Ratio: $FX_DUCK_RATIO:1 | LFE Duck Ratio: $LFE_DUCK_RATIO:1"
+    echo "Makeup Gain: $MAKEUP_GAIN | Limiter finale ottimizzato: 0.94"
     echo
     echo "MISURAZIONE ORIGINALE:"
     echo "LUFS: $LUFS | True Peak: $PEAK dBTP | LRA: $LRA LU"
