@@ -86,10 +86,17 @@ chmod +x ducking_auto_*.sh
 ## Script Ausiliari
 > 🛠️ I tuoi droidi da battaglia
 
+### ducking_auto_stereo.sh
+> Hai un file video con audio in stereo? Questo batch tratta il file come un film slim & light.
+```bash
+./ducking_auto_stereo.sh [bitrate]
+```
+
 ### ducking_serie_batch.sh
-> Vuoi processare un’intera stagione di fila? Questo batch fa tutto mentre dormi.  
+> Vuoi processare un’intera stagione di fila? Questi batch fanno tutto da soli mentre dormi.  
 ```bash
 ./ducking_serie_batch.sh [bitrate]
+./ducking_stereo_batch.sh [bitrate]
 ```
 
 ### ducking_dts_conversion.sh
