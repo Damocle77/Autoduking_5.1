@@ -31,9 +31,11 @@
 
 Tre preset Bash, ognuno calibrato per un universo diverso. Tutti sfruttano una catena di processamento avanzata per trasformare un mix standard in un'esperienza audio a prova di nerd. Tecnologie chiave:
 
-- **Analisi Adattiva:** Lo script scansiona l'audio come un droide protocollare, misurando Loudness, True Peak e Dinamica.
-- **Ducking Intelligente:** Crea uno “scudo deflettore” che abbassa dinamicamente gli altri suoni solo quando serve.
-- **EQ Jedi:** Modella il suono in modo naturale, mai artificiale.
+- **Analisi Adattiva:** Lo script scansiona l'audio come un droide protocollare della Federazione Galattica, misurando Loudness, True Peak e Dinamica proprio come uno scan di Tricorder su un pianeta ostile.
+- **Ducking Intelligente:** Crea uno “scudo deflettore” alla Scotty che abbassa dinamicamente gli altri suoni solo quando serve, così la voce rimane sempre in primo piano come un monologo di Iron Man.
+- **Ricampionamento SoxR:** Prende il flusso audio e lo teletrasporta a una nuova dimensione—ehm, frequenza! SoxR ricampiona segnali come il TARDIS viaggia tra epoche: viaggiando velocissimo, mantenendo sempre la qualità top.
+- **Filtro Deesser:** Intercetta le “S” sibilanti come un cacciatore di taglie nell’iperspazio: elimina le frequenze fastidiose senza far fuori la voce umana, un po’ come Han Solo abbatte solo gli stormtrooper giusti.
+- **EQ Jedi:** Modella il suono con la grazia di un Maestro Jedi: l’equalizzazione non è mai forzata o artificiale, ma segue il naturale flusso della Forza, assicurando che ogni traccia suoni con equilibrio e naturalezza.
 
 | Script                      | Missione                                 | Output                        | Tattiche Speciali                                             |
 |-----------------------------|------------------------------------------|-------------------------------|---------------------------------------------------------------|
