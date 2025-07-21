@@ -3,7 +3,8 @@
 
 > “Non serve essere Tony Stark per ottimizzare il mix: questi script sono già il tuo Jarvis audio.”  
 > “Se vuoi sentire la voce di Bulma anche quando Vegeta urla, qui trovi gli strumenti adatti!”  
-> “Dialoghi italiani chiari come un cristallo di Kyber, LFE controllato come la "curvatura" della Voyager.  
+> “Dialoghi italiani chiari come un cristallo di Kyber, LFE controllato come la "curvatura" della Voyager.”  
+> "Per un missaggio che neanche gli anelli del Dr. Strange possono alterare!"
 
 ![SELECT name AS 'Sandro Sabbioni', handle AS 'D@mocle77' FROM developers](https://img.shields.io/badge/SELECT%20name%20AS%20'Sandro%20Sabbioni'%2C%20handle%20AS%20'D%40mocle77'%20FROM%20developers-blue)
 
