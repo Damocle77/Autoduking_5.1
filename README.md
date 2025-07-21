@@ -92,7 +92,7 @@ chmod +x ducking_auto_*.sh
 ./ducking_auto_stereo.sh [bitrate]
 ```
 
-### ducking_serie_batch.sh
+### ducking_serie/stereo_batch.sh
 > Vuoi processare un’intera stagione di fila? Questi batch fanno tutto da soli mentre dormi.  
 ```bash
 ./ducking_serie_batch.sh [bitrate]
