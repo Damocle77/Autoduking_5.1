@@ -4,7 +4,9 @@
 > “Non serve essere Tony Stark per ottimizzare il mix: questi script sono già il tuo Jarvis audio.”  
 > “Se vuoi sentire la voce di Bulma anche quando Vegeta urla, qui trovi gli strumenti adatti!”  
 > “Dialoghi italiani chiari come un cristallo di Kyber, LFE controllato come la "curvatura" della Voyager.  
-> “SELECT name AS 'Sandro Sabbioni', handle AS 'D@mocle77' FROM developers”
+
+![SELECT name AS 'Sandro Sabbioni', handle AS 'D@mocle77' FROM developers](https://img.shields.io/badge/SELECT%20name%20AS%20'Sandro%20Sabbioni'%2C%20handle%20AS%20'D%40mocle77'%20FROM%20developers-blue)
+
 
 ## Indice
 
@@ -48,7 +50,7 @@ Tre preset Bash, ognuno calibrato per un universo diverso. Tutti sfruttano una c
 4. Goditi la traccia ottimizzata oppure usa il batch per le serie.
 5. [Opzionale] Converti con DTS finale per compatibilità universale.
 
-🎬 Vuoi processare una stagione intera? Vai a [ducking_serie_batch.sh](#ducking_serie_batchsh)  
+🎬 Vuoi processare una stagione intera? Vai a [ducking_serie_batch.sh](#ducking_serie_stereo_batchsh)  
 🔊 Vuoi la traccia DTS? Vai a [ducking_dts_conversion.sh](#ducking_dts_conversionsh)
 
 ## Requisiti
@@ -92,7 +94,7 @@ chmod +x ducking_auto_*.sh
 ./ducking_auto_stereo.sh [bitrate]
 ```
 
-### ducking_serie/stereo_batch.sh
+### ducking_serie_stereo_batch.sh
 > Vuoi processare un’intera stagione di fila? Questi batch fanno tutto da soli mentre dormi.  
 ```bash
 ./ducking_serie_batch.sh [bitrate]
