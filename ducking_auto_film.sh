@@ -29,7 +29,7 @@ show_spinner() {
 # ==============================================================================
 # INIZIO DELLO SCRIPT PRINCIPALE
 # ==============================================================================
-# ducking_auto_film.sh v1.5 - Audio Cinematografico Ottimizzato
+# ducking_auto_film.sh v1.6 - Audio Cinematografico Ottimizzato
 # Preset auto-adattivo per film con analisi intelligente del mix audio
 #
 # + Analisi LUFS/True Peak completa con valutazione del contenuto
@@ -119,34 +119,35 @@ echo
 echo "RACCOMANDAZIONI AUTOMATICHE CINEMATOGRAFICHE:"
 # Parametri base per film cinematografici - DUCKING REATTIVO E SICURO
 # NB. (LFE_REDUCTION=0.77 -> ridotto del 23%)
-VOICE_BOOST=3.5
+VOICE_BOOST=3.3
 LFE_REDUCTION=0.76
 LFE_DUCK_THRESHOLD=0.003
 LFE_DUCK_RATIO=4.0
 FX_DUCK_RATIO=2.6
 FX_DUCK_THRESHOLD=0.006
-FRONT_FX_REDUCTION=0.90
+FRONT_FX_REDUCTION=0.96
 FX_ATTACK=20
 FX_RELEASE=600
 LFE_ATTACK=15
 LFE_RELEASE=550
 LFE_LP_FREQ=120
 SURROUND_BOOST=1.85
-MAKEUP_GAIN=5.5
+MAKEUP_GAIN=5.0
 # NB. (MAKUP_GAIN aumentato necessita di riduzione del limiter su FINAL_FILTER)
-# Regole adattive per gestire al meglio i mix aggressivi
+
+# -------------------- LOGICA ADATTIVA --------------------
 if [ $(awk "BEGIN {print ($LUFS > -14) ? 1 : 0}") -eq 1 ]; then
     LFE_DUCK_RATIO=$(awk "BEGIN {print $LFE_DUCK_RATIO + 0.6}")
     FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.4}")
     LFE_REDUCTION=$(awk "BEGIN {print $LFE_REDUCTION - 0.05}")
-    MAKEUP_GAIN=$(awk "BEGIN {print $MAKEUP_GAIN + 0.9}")
+    MAKEUP_GAIN=$(awk "BEGIN {print $MAKEUP_GAIN + 0.6}")
     echo "ATTIVO: Protocollo 'Mix Esplosivo'. Ducking potenziato per scene d'azione intense."
     echo "APPLICATO: Makeup gain extra (+0.9) per compensare riduzioni"
 elif [ $(awk "BEGIN {print ($LUFS < -20) ? 1 : 0}") -eq 1 ]; then
     VOICE_BOOST=$(awk "BEGIN {print $VOICE_BOOST + 0.1}")
     FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.3}")
     LFE_DUCK_RATIO=$(awk "BEGIN {print $LFE_DUCK_RATIO + 0.4}")
-    MAKEUP_GAIN=$(awk "BEGIN {print $MAKEUP_GAIN + 1.1}")
+    MAKEUP_GAIN=$(awk "BEGIN {print $MAKEUP_GAIN + 0.2}")
     echo "APPLICATO: Audio conservativo - boost dialoghi minimo e ducking rinforzato."
     echo "APPLICATO: Makeup gain sostanzioso (+1.1) per volume finale ottimale"
 else
@@ -168,9 +169,10 @@ if [ $(awk "BEGIN {print ($PEAK > -1.5 && $LRA > 13) ? 1 : 0}") -eq 1 ]; then
     echo "ENGAGE: Protocollo Anti-Detonazione LFE. Domati i sub-bassi."
 fi
 
-# Filtro voce italiana con De-Esser
-VOICE_EQ="highpass=f=85,deesser=i=0.12:m=0.4:f=0.23"
-echo "APPLICATO: Filtro pulizia voce High-pass 85Hz + De-Esser per controllo sibilanti."
+# Filtro voce italiana ultra-conservativo - solo processing essenziale
+#VOICE_EQ="highpass=f=85,deesser=i=0.12:m=0.4:f=0.23"
+VOICE_EQ="highpass=f=70,deesser=i=0.02:m=0.12:f=0.15,aexciter=level_in=1:level_out=1:amount=0.65:drive=2.25:blend=0:freq=2600:ceil=10000:listen=0,compand=attacks=0.0025:decays=0.015:points=-75/-75|-40/-39|-25/-20|-10/-7:soft-knee=5:gain=0.25"
+echo "APPLICATO: Filtro voce ultra-conservativo: HP dolce 70Hz + Exciter sottile + De-Esser chirurgico + Compand trasparente."
 
 # Regole per film drammatici con dialoghi sommessi
 if [ $(awk "BEGIN {print ($LRA > 18 && $LUFS < -20) ? 1 : 0}") -eq 1 ]; then
@@ -180,17 +182,18 @@ fi
 
 # Preparazione filtri
 COMPAND_PARAMS="attacks=0.01:decays=0.03:points=-60/-60|-25/-25|-12/-8:soft-knee=2:gain=0"
-SIDECHAIN_PREP="bandpass=f=1900:width_type=h:w=3200,volume=3.1,compand=${COMPAND_PARAMS},agate=threshold=-30dB:ratio=2.0:attack=1:release=5000"
+# Cartoni/Film - release più veloce:
+SIDECHAIN_PREP="bandpass=f=2200:width_type=h:w=2800,volume=2.6,compand=${COMPAND_PARAMS},agate=threshold=-30dB:ratio=2.0:attack=0.5:release=4000"
 LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=70:width_type=q:w=1.8:g=0.5"
 SURROUND_EQ="highpass=f=60,volume=1.06" # +0.5dB Boost
 FRONT_FX_EQ="highpass=f=85"
 
 # Riorganizzazione filtri finali
-FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.97:attack=45:release=350:asc=1"
+FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95:attack=2:release=70:asc=1"
 LFE_FILTER="highpass=f=${LFE_HP_FREQ}:poles=2,lowpass=f=${LFE_LP_FREQ}:poles=2,${LFE_EQ},volume=${LFE_REDUCTION}"
 LFE_SC_PARAMS="threshold=${LFE_DUCK_THRESHOLD}:ratio=${LFE_DUCK_RATIO}:attack=${LFE_ATTACK}:release=${LFE_RELEASE}:makeup=1.0"
 FX_SC_PARAMS="threshold=${FX_DUCK_THRESHOLD}:ratio=${FX_DUCK_RATIO}:attack=${FX_ATTACK}:release=${FX_RELEASE}:makeup=1.0"
-FINAL_FILTER="aresample=resampler=soxr:precision=28:cutoff=0.95:cheby=1,volume=${MAKEUP_GAIN},alimiter=level_in=1:level_out=1:limit=0.94:attack=35:release=400:asc=1,aformat=channel_layouts=5.1"
+FINAL_FILTER="aresample=resampler=soxr:precision=28:cutoff=0.95:cheby=1,volume=${MAKEUP_GAIN},alimiter=level_in=1:level_out=1:limit=0.95:attack=2:release=100:asc=1,aformat=channel_layouts=5.1"
 
 # -------------------- ESECUZIONE FFMPEG --------------------
 echo
