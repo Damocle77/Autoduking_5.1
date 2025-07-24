@@ -1,5 +1,5 @@
 
-# 🎛️ Autoducking 5.1 – "Tuffati nel suono" – v1.5
+# 🎛️ Autoducking 5.1 – "Tuffati nel suono" – v1.6
 
 > “Non serve essere Tony Stark per ottimizzare il mix: questi script sono già il tuo Jarvis audio.”  
 > “Se vuoi sentire la voce di Bulma anche quando Vegeta urla, qui trovi gli strumenti adatti!”  
@@ -137,6 +137,7 @@ Non si inventa qualità: si tira fuori il massimo dal materiale originale.
 - Output EAC3 e DTS robustissimi con ffmpeg.
 - Ducking/LFE specifico per preset.
 - Ricampionamento HD con SoxR.
+- Equalizzazione HD voce italina con Aexciter.
 - Tutto open source e facilmente editabile.
 
 ---
