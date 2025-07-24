@@ -55,6 +55,7 @@ Tre preset Bash, ognuno calibrato per un universo diverso. Tutti sfruttano una c
 
 🎬 Vuoi processare una stagione intera? Vai a [ducking_serie_batch.sh](#ducking_serie_stereo_batchsh)  
 🔊 Vuoi la traccia DTS? Vai a [ducking_dts_conversion.sh](#ducking_dts_conversionsh)
+🛠️ Hai un file in semplice Stereo? Vai a [ducking_serie_stereo_batch.sh](#ducking_auto_stereosh) 
 
 ## Requisiti
 > ⚙️ Armati come un Mandaloriano
