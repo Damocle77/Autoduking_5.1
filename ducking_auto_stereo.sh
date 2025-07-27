@@ -42,12 +42,12 @@ show_spinner() {
 # ==============================================================================
 
 INPUT_FILE="$1"
-OUTPUT_FILE="${INPUT_FILE%.*}_serie_ducked.mkv"
+OUTPUT_FILE="${INPUT_FILE%.*}_stereo_ducked.mkv"
 BITRATE="384k"
 [ ! -z "$2" ] && BITRATE="$2"
 
 if [ -z "$INPUT_FILE" ]; then
-    echo "Uso: ./ducking_auto_serie_stereo_minimal.sh \"file.mkv\" [bitrate]"
+    echo "Uso: ./ducking_auto_stereo.sh \"file.mkv\" [bitrate]"
     exit 1
 fi
 
