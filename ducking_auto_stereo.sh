@@ -53,9 +53,19 @@ fi
 
 # -------------------- ANALISI SPETTRALE --------------------
 echo "===================== ANALISI SPETTRALE =========================="
+echo "Avvio array di sensori... Calibrazione del flusso audio in corso."
+echo "Acquisizione telemetria EBU R128: calcolo del Loudness Integrato."
+echo "Scansione subspaziale per True Peak e Loudness Range (LRA)."
+echo "ETA per decodifica del segnale: circa 10 min per ora di runtime."
+
+# Avvia lo spinner in background
 show_spinner &
 SPIN_PID=$!
+
+# Esegui l'analisi con ffmpeg
 ANALYSIS=$(ffmpeg -nostdin -i "$INPUT_FILE" -af loudnorm=print_format=summary -f null - 2>&1)
+
+# Termina lo spinner e pulisci la riga
 kill $SPIN_PID 2>/dev/null
 wait $SPIN_PID 2>/dev/null
 printf "\rAnalisi completata!                        \n"
