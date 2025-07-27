@@ -18,11 +18,18 @@ trap cleanup SIGINT
 
 # Funzione per lo spinner
 show_spinner() {
-    local spin_chars="/-\|" # Versione ASCII super compatibile
+    local spin_chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏" # Spinner animato
+    local fallback_chars="/-|\\*" # Fallback ASCII se i caratteri Unicode non funzionano
+    
+    # Test se supporta caratteri Unicode
+    if ! printf "%s" "⠋" >/dev/null 2>&1; then
+        spin_chars="$fallback_chars"
+    fi
+    
     while true; do
         for (( i=0; i<${#spin_chars}; i++ )); do
             printf "\rScansione in corso: %s " "${spin_chars:$i:1}"
-            sleep 0.1
+            sleep 0.15
         done
     done
 }
@@ -52,8 +59,8 @@ if [ -z "$INPUT_FILE" ]; then
     exit 1
 fi
 
-# -------------------- ANALISI LOUDNESS --------------------
-echo "===================== ANALISI LOUDNESS =========================="
+# -------------------- ANALISI SPETTRALE --------------------
+echo "===================== ANALISI SPETTRALE =========================="
 echo "Avvio array di sensori... Calibrazione del flusso audio in corso."
 echo "Acquisizione telemetria EBU R128: calcolo del Loudness Integrato."
 echo "Scansione subspaziale per True Peak e Loudness Range (LRA)."
@@ -116,43 +123,43 @@ echo "Target Offset: $TARGET_OFFSET LU"
 echo
 
 echo "RACCOMANDAZIONI AUTOMATICHE SERIE TV:"
-# Parametri base (preset serie genere) - DUCKING REATTIVO E SICURO
-# NB. (LFE_REDUCTION=0.77 -> ridotto del 23%)
+# Parametri base (preset serie genere) - OTTIMIZZATO LG SP7 + SPK8
+# NB. Front preservati per proiettori sonori Meridian
 VOICE_BOOST=3.3
 LFE_REDUCTION=0.75
 LFE_DUCK_THRESHOLD=0.004
 LFE_DUCK_RATIO=2.8
-FX_DUCK_THRESHOLD=0.007
-FX_DUCK_RATIO=2.0
-FX_ATTACK=20
-FX_RELEASE=650
-FRONT_FX_REDUCTION=0.96
+FX_DUCK_THRESHOLD=0.012
+FX_DUCK_RATIO=1.8
+FX_ATTACK=30
+FX_RELEASE=750
+FRONT_FX_REDUCTION=0.90
 LFE_ATTACK=15
 LFE_RELEASE=600
 LFE_HP_FREQ=35
 LFE_LP_FREQ=100
-SURROUND_BOOST=1.75
+SURROUND_BOOST=2.0
 MAKEUP_GAIN=5.0
-# NB. (MAKUP_GAIN aumentato necessita di riduzione del limiter su FINAL_FILTER)
+# NB. (MAKEUP_GAIN aumentato necessita di riduzione del limiter su FINAL_FILTER)
 
 # -------------------- LOGICA ADATTIVA --------------------
 if [ $(awk "BEGIN {print ($LUFS < -20) ? 1 : 0}") -eq 1 ]; then
     VOICE_BOOST=$(awk "BEGIN {print $VOICE_BOOST + 0.1}")
-    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.3}")
+    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.2}")
     LFE_DUCK_RATIO=$(awk "BEGIN {print $LFE_DUCK_RATIO + 0.3}")
     MAKEUP_GAIN=$(awk "BEGIN {print $MAKEUP_GAIN + 0.2}")
     echo "APPLICATO: Boost dialogo minimo (+0.1dB) per preservare bilanciamento stereo"
-    echo "APPLICATO: Ducking aumentato (FX +0.3, LFE +0.3) per chiarezza"
+    echo "APPLICATO: Ducking front dolce (+0.2) preservando proiezione Meridian"
     echo "APPLICATO: Makeup gain leggero (+0.2) per voci basse"
 elif [ $(awk "BEGIN {print ($LUFS > -16) ? 1 : 0}") -eq 1 ]; then
-    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.3}")
+    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.2}")
     LFE_DUCK_RATIO=$(awk "BEGIN {print $LFE_DUCK_RATIO + 0.3}")
     MAKEUP_GAIN=$(awk "BEGIN {print $MAKEUP_GAIN + 0.8}")
     echo "APPLICATO: Voice boost invariato per preservare bilanciamento"
-    echo "APPLICATO: Ducking rinforzato per mix ultra-compresso"
+    echo "APPLICATO: Ducking front controllato per mix ultra-compresso"
     echo "APPLICATO: Makeup gain potenziato (+0.8) per livello finale corretto"
 else
-    echo "APPLICATO: Parametri standard bilanciati - loudness nel range ottimale"
+    echo "APPLICATO: Parametri LG SP7 + SPK8 serie TV - front preservati per spazialità"
     echo "APPLICATO: Makeup gain principale (${MAKEUP_GAIN}) per volume finale corretto"
 fi
 # Controllo True Peak per LFE
@@ -164,9 +171,9 @@ else
 fi
 # Controllo True Peak per FX
 if [ $(awk "BEGIN {print ($LRA < 5 && $LUFS > -18) ? 1 : 0}") -eq 1 ]; then
-    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.6}")
+    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.4}")
     FX_RELEASE=$(awk "BEGIN {print $FX_RELEASE - 25}")
-    echo "ATTIVO: Protocollo 'Maratona Binge-Watching'. Ducking ottimizzato per dialoghi continui."
+    echo "ATTIVO: Protocollo 'Maratona Binge-Watching'. Ducking ottimizzato preservando Meridian."
     echo "APPLICATO: Rilascio ducking più rapido per transizioni fluide"
 fi
 
@@ -189,8 +196,8 @@ fi
 COMPAND_PARAMS="attacks=0.02:decays=0.05:points=-60/-60|-25/-25|-12/-8:soft-knee=2:gain=0"
 # Cartoni/Film - release più veloce:
 SIDECHAIN_PREP="bandpass=f=2200:width_type=h:w=2800,volume=2.6,compand=${COMPAND_PARAMS},agate=threshold=-30dB:ratio=2.0:attack=0.5:release=4500"
-SURROUND_EQ="highpass=f=60,volume=1.06" # +0.5dB Boost
-FRONT_FX_EQ="highpass=f=85"
+SURROUND_EQ="highpass=f=60,volume=${SURROUND_BOOST}" # Boost surround variabile
+FRONT_FX_EQ="highpass=f=80"
 
 # Riorganizzazione filtri finali
 FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95:attack=2:release=70:asc=1"
@@ -249,7 +256,7 @@ if [ $ffmpeg_exit_code -eq 0 ]; then
     echo "PARAMETRI FINALI APPLICATI:"
     echo "Voice Boost: $VOICE_BOOST dB | LFE Reduction: $LFE_REDUCTION"
     echo "FX Duck Ratio: $FX_DUCK_RATIO:1 | LFE Duck Ratio: $LFE_DUCK_RATIO:1"
-    echo "Makeup Gain: $MAKEUP_GAIN | Limiter finale ottimizzato: 0.94"
+    echo "Makeup Gain: $MAKEUP_GAIN | Limiter finale ottimizzato: 0.95"
     echo
     echo "MISURAZIONE ORIGINALE:"
     echo "LUFS: $LUFS | True Peak: $PEAK dBTP | LRA: $LRA LU"

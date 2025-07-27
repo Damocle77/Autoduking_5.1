@@ -15,11 +15,18 @@ trap cleanup SIGINT
 
 # Funzione per lo spinner
 show_spinner() {
-    local spin_chars="/-\|"
+    local spin_chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏" # Spinner animato
+    local fallback_chars="/-|\\*" # Fallback ASCII se i caratteri Unicode non funzionano
+    
+    # Test se supporta caratteri Unicode
+    if ! printf "%s" "⠋" >/dev/null 2>&1; then
+        spin_chars="$fallback_chars"
+    fi
+    
     while true; do
         for (( i=0; i<${#spin_chars}; i++ )); do
             printf "\rScansione in corso: %s " "${spin_chars:$i:1}"
-            sleep 0.1
+            sleep 0.15
         done
     done
 }
@@ -44,8 +51,8 @@ if [ -z "$INPUT_FILE" ]; then
     exit 1
 fi
 
-# -------------------- ANALISI LOUDNESS --------------------
-echo "===================== ANALISI LOUDNESS =========================="
+# -------------------- ANALISI SPETTRALE --------------------
+echo "===================== ANALISI SPETTRALE =========================="
 show_spinner &
 SPIN_PID=$!
 ANALYSIS=$(ffmpeg -nostdin -i "$INPUT_FILE" -af loudnorm=print_format=summary -f null - 2>&1)
@@ -59,11 +66,11 @@ LRA=$(echo "$ANALYSIS" | grep "Input LRA" | awk '{print $3}' | sed 's/LU//')
 
 # -------------------- LOGICA ADATTIVA SEMPLIFICATA --------------------
 # NB. (LFE_REDUCTION -> Più ti avvicini a 1, meno riduzione stai applicando
-VOICE_BOOST=3.3
-LFE_REDUCTION=0.81
+VOICE_BOOST=3.4
+LFE_REDUCTION=0.80
 LFE_HP_FREQ=35
 MAKEUP_GAIN=5.0
-# NB. (MAKUP_GAIN aumentato necessita di riduzione del limiter su FINAL_FILTER)
+# NB. (MAKEUP_GAIN aumentato necessita di riduzione del limiter su FINAL_FILTER)
 
 if [ $(awk "BEGIN {print ($LUFS < -20) ? 1 : 0}") -eq 1 ]; then
     VOICE_BOOST=$(awk "BEGIN {print $VOICE_BOOST + 0.5}")
@@ -73,7 +80,7 @@ fi
 # Filtro voce italiana ultra-conservativo - solo processing essenziale
 #VOICE_EQ="highpass=f=85,deesser=i=0.12:m=0.4:f=0.23"
 VOICE_EQ="highpass=f=70,deesser=i=0.02:m=0.12:f=0.15,aexciter=level_in=1:level_out=1:amount=0.65:drive=2.25:blend=0:freq=2600:ceil=10000:listen=0,compand=attacks=0.0025:decays=0.015:points=-75/-75|-40/-39|-25/-20|-10/-7:soft-knee=5:gain=0.25"
-FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95:attack=2:release=70:asc=1"                                         
+FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95:attack=2:release=70:asc=1"
 LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=65:width_type=q:w=1.8:g=0.4"
 FINAL_FILTER="aresample=resampler=soxr:precision=28:cutoff=0.95:cheby=1,volume=${MAKEUP_GAIN},alimiter=level_in=1:level_out=1:limit=0.95:attack=2:release=100:asc=1,aformat=channel_layouts=stereo"
 

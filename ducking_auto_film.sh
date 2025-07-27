@@ -18,11 +18,18 @@ trap cleanup SIGINT
 
 # Funzione per lo spinner
 show_spinner() {
-    local spin_chars="/-\|" # Versione ASCII super compatibile
+    local spin_chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏" # Spinner animato
+    local fallback_chars="/-|\\*" # Fallback ASCII se i caratteri Unicode non funzionano
+    
+    # Test se supporta caratteri Unicode
+    if ! printf "%s" "⠋" >/dev/null 2>&1; then
+        spin_chars="$fallback_chars"
+    fi
+    
     while true; do
         for (( i=0; i<${#spin_chars}; i++ )); do
             printf "\rScansione in corso: %s " "${spin_chars:$i:1}"
-            sleep 0.1
+            sleep 0.15
         done
     done
 }
@@ -52,8 +59,8 @@ if [ -z "$INPUT_FILE" ]; then
     exit 1
 fi
 
-# -------------------- ANALISI LOUDNESS --------------------
-echo "====================== ANALISI LOUDNESS ========================="
+# -------------------- ANALISI SPETTRALE --------------------
+echo "===================== ANALISI SPETTRALE =========================="
 echo "Avvio array di sensori... Calibrazione del flusso audio in corso."
 echo "Acquisizione telemetria EBU R128: calcolo del Loudness Integrato."
 echo "Scansione subspaziale per True Peak e Loudness Range (LRA)."
@@ -101,7 +108,7 @@ else
     echo "Condizione Verde: Headroom ottimale. Spazio di manovra abbondante."
 fi
 echo
-# -------------------- ANALISI LOUDNESS RANGE --------------------
+# -------------------- ANALISI DINAMICA --------------------
 echo "DINAMICA E CARATTERISTICHE FILMICHE:"
 echo "Loudness Range: $LRA LU"
 if [ $(awk "BEGIN {print ($LRA < 6) ? 1 : 0}") -eq 1 ]; then
@@ -117,41 +124,41 @@ echo
 
 # -------------------- LOGICA ADATTIVA --------------------
 echo "RACCOMANDAZIONI AUTOMATICHE CINEMATOGRAFICHE:"
-# Parametri base per film cinematografici - DUCKING REATTIVO E SICURO
-# NB. (LFE_REDUCTION=0.77 -> ridotto del 23%)
+# Parametri base per film cinematografici - OTTIMIZZATO LG SP7 + SPK8
+# NB. Front preservati per proiettori sonori Meridian
 VOICE_BOOST=3.3
 LFE_REDUCTION=0.76
 LFE_DUCK_THRESHOLD=0.003
 LFE_DUCK_RATIO=4.0
-FX_DUCK_RATIO=2.6
-FX_DUCK_THRESHOLD=0.006
-FRONT_FX_REDUCTION=0.96
-FX_ATTACK=20
-FX_RELEASE=600
+FX_DUCK_RATIO=2.2
+FX_DUCK_THRESHOLD=0.012
+FRONT_FX_REDUCTION=0.90
+FX_ATTACK=30
+FX_RELEASE=700
 LFE_ATTACK=15
 LFE_RELEASE=550
 LFE_LP_FREQ=120
-SURROUND_BOOST=1.85
+SURROUND_BOOST=2.2
 MAKEUP_GAIN=5.0
-# NB. (MAKUP_GAIN aumentato necessita di riduzione del limiter su FINAL_FILTER)
+# NB. (MAKEUP_GAIN aumentato necessita di riduzione del limiter su FINAL_FILTER)
 
 # -------------------- LOGICA ADATTIVA --------------------
 if [ $(awk "BEGIN {print ($LUFS > -14) ? 1 : 0}") -eq 1 ]; then
     LFE_DUCK_RATIO=$(awk "BEGIN {print $LFE_DUCK_RATIO + 0.6}")
-    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.4}")
+    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.3}")
     LFE_REDUCTION=$(awk "BEGIN {print $LFE_REDUCTION - 0.05}")
     MAKEUP_GAIN=$(awk "BEGIN {print $MAKEUP_GAIN + 0.6}")
-    echo "ATTIVO: Protocollo 'Mix Esplosivo'. Ducking potenziato per scene d'azione intense."
+    echo "ATTIVO: Protocollo 'Mix Esplosivo'. Ducking potenziato ma front preservati per Meridian."
     echo "APPLICATO: Makeup gain extra (+0.9) per compensare riduzioni"
 elif [ $(awk "BEGIN {print ($LUFS < -20) ? 1 : 0}") -eq 1 ]; then
     VOICE_BOOST=$(awk "BEGIN {print $VOICE_BOOST + 0.1}")
-    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.3}")
+    FX_DUCK_RATIO=$(awk "BEGIN {print $FX_DUCK_RATIO + 0.2}")
     LFE_DUCK_RATIO=$(awk "BEGIN {print $LFE_DUCK_RATIO + 0.4}")
     MAKEUP_GAIN=$(awk "BEGIN {print $MAKEUP_GAIN + 0.2}")
-    echo "APPLICATO: Audio conservativo - boost dialoghi minimo e ducking rinforzato."
+    echo "APPLICATO: Audio conservativo - boost dialoghi minimo e ducking front preservato."
     echo "APPLICATO: Makeup gain sostanzioso (+1.1) per volume finale ottimale"
 else
-    echo "APPLICATO: Parametri cinema bilanciati - ducking efficace per fantasy/sci-fi."
+    echo "APPLICATO: Parametri LG SP7 + SPK8 bilanciati - ducking efficace preservando spazialità."
     echo "APPLICATO: Makeup gain principale (${MAKEUP_GAIN}) per volume finale corretto"
 fi
 
@@ -185,8 +192,8 @@ COMPAND_PARAMS="attacks=0.01:decays=0.03:points=-60/-60|-25/-25|-12/-8:soft-knee
 # Cartoni/Film - release più veloce:
 SIDECHAIN_PREP="bandpass=f=2200:width_type=h:w=2800,volume=2.6,compand=${COMPAND_PARAMS},agate=threshold=-30dB:ratio=2.0:attack=0.5:release=4000"
 LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=70:width_type=q:w=1.8:g=0.5"
-SURROUND_EQ="highpass=f=60,volume=1.06" # +0.5dB Boost
-FRONT_FX_EQ="highpass=f=85"
+SURROUND_EQ="highpass=f=60,volume=${SURROUND_BOOST}" # Boost surround variabile
+FRONT_FX_EQ="highpass=f=80"
 
 # Riorganizzazione filtri finali
 FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95:attack=2:release=70:asc=1"
@@ -245,7 +252,7 @@ if [ $ffmpeg_exit_code -eq 0 ]; then
     echo "PARAMETRI FINALI APPLICATI:"
     echo "Voice Boost: $VOICE_BOOST dB | LFE Reduction: $LFE_REDUCTION"
     echo "FX Duck Ratio: $FX_DUCK_RATIO:1 | LFE Duck Ratio: $LFE_DUCK_RATIO:1"
-    echo "Makeup Gain: $MAKEUP_GAIN | Limiter finale ottimizzato: 0.94"
+    echo "Makeup Gain: $MAKEUP_GAIN | Limiter finale ottimizzato: 0.95"
     echo
     echo "MISURAZIONE ORIGINALE:"
     echo "LUFS: $LUFS | True Peak: $PEAK dBTP | LRA: $LRA LU"
