@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ================================================================================
-# ducking_auto_serie_batch.sh – v1.6 "Protocollo Autodistruzione"
+# ducking_auto_serie_batch.sh – v1.7 "Protocollo Autodistruzione"
 # Batch per lanciare ducking_auto_serie.sh.
 # Premendo Ctrl+C si INTERROMPE TUTTO: batch e processo figlio.
 # ================================================================================

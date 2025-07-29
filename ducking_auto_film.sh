@@ -36,7 +36,7 @@ show_spinner() {
 # ==============================================================================
 # INIZIO DELLO SCRIPT PRINCIPALE
 # ==============================================================================
-# ducking_auto_film.sh v1.6 - Audio Cinematografico Ottimizzato
+# ducking_auto_film.sh v1.7 - Audio Cinematografico Ottimizzato
 # Preset auto-adattivo per film con analisi intelligente del mix audio
 #
 # + Analisi LUFS/True Peak completa con valutazione del contenuto
@@ -178,8 +178,8 @@ fi
 
 # Filtro voce italiana ultra-conservativo - solo processing essenziale
 #VOICE_EQ="highpass=f=85,deesser=i=0.12:m=0.4:f=0.23"
-VOICE_EQ="highpass=f=70,deesser=i=0.02:m=0.12:f=0.15,aexciter=level_in=1:level_out=1:amount=0.65:drive=2.25:blend=0:freq=2600:ceil=10000:listen=0,compand=attacks=0.0025:decays=0.015:points=-75/-75|-40/-39|-25/-20|-10/-7:soft-knee=5:gain=0.25"
-echo "APPLICATO: Filtro voce ultra-conservativo: HP dolce 70Hz + Exciter sottile + De-Esser chirurgico + Compand trasparente."
+VOICE_EQ="highpass=f=70,deesser=i=0.02:m=0.12:f=0.15,aexciter=level_in=1:level_out=1:amount=0.45:drive=1.8:blend=0:freq=2600:ceil=10000:listen=0,compand=attacks=0.0025:decays=0.015:points=-75/-75|-40/-39|-25/-20|-10/-7:soft-knee=5:gain=0.25"
+echo "APPLICATO: Filtro voce bilanciato: HP dolce + Exciter conservativo + De-Esser chirurgico + Compand trasparente."
 
 # Regole per film drammatici con dialoghi sommessi
 if [ $(awk "BEGIN {print ($LRA > 18 && $LUFS < -20) ? 1 : 0}") -eq 1 ]; then
@@ -192,7 +192,7 @@ COMPAND_PARAMS="attacks=0.01:decays=0.03:points=-60/-60|-25/-25|-12/-8:soft-knee
 # Cartoni/Film - release più veloce:
 SIDECHAIN_PREP="bandpass=f=2200:width_type=h:w=2800,volume=2.6,compand=${COMPAND_PARAMS},agate=threshold=-30dB:ratio=2.0:attack=0.5:release=4000"
 LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=70:width_type=q:w=1.8:g=0.5"
-SURROUND_EQ="highpass=f=60,volume=${SURROUND_BOOST}" # Boost surround variabile
+SURROUND_EQ="highpass=f=60,agate=threshold=-38dB:ratio=2.0:attack=5:release=400:makeup=1,volume=${SURROUND_BOOST}" # Gate Film: preserva atmosfera cinematografica
 FRONT_FX_EQ="highpass=f=80"
 
 # Riorganizzazione filtri finali

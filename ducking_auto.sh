@@ -35,7 +35,7 @@ show_spinner() {
 # ==================================================================================================
 # INIZIO DELLO SCRIPT PRINCIPALE
 # ==================================================================================================
-# ducking_auto.sh v1.2 - Il Santo Graal dell'Audio Ottimizzato
+# ducking_auto.sh v1.7 - Il Santo Graal dell'Audio Ottimizzato
 # Unifica la Forza di Cartoni[1], Film[2], Serie[3] e Stereo[4] in un solo script!
 # Auto-seleziona il preset perfetto con analisi LUFS/PEAK/LRA o rilevazione canali
 # Potenziato per dialoghi cristallini, bassi controllati ed effetti da "May the Force be with you!"
@@ -263,28 +263,31 @@ esac
 # Filtri specifici per preset
 case $PRESET in
     cartoni)
-        VOICE_EQ="highpass=f=70,deesser=i=0.02:m=0.12:f=0.15,aexciter=level_in=1:level_out=1:amount=0.65:drive=2.25:blend=0:freq=2600:ceil=10000:listen=0,compand=attacks=0.0025:decays=0.015:points=-75/-75|-40/-39|-25/-20|-10/-7:soft-knee=5:gain=0.25"
+        VOICE_EQ="highpass=f=70,deesser=i=0.02:m=0.12:f=0.15,aexciter=level_in=1:level_out=1:amount=0.45:drive=1.8:blend=0:freq=2600:ceil=10000:listen=0,compand=attacks=0.0025:decays=0.015:points=-75/-75|-40/-39|-25/-20|-10/-7:soft-knee=5:gain=0.25"
         LFE_EQ="equalizer=f=35:width_type=q:w=1.6:g=0.6,equalizer=f=75:width_type=q:w=1.8:g=0.4"
         COMPAND_PARAMS="attacks=0.005:decays=0.01:points=-60/-60|-30/-30|-15/-8:soft-knee=2:gain=0"
+        SURROUND_EQ="highpass=f=60,agate=threshold=-32dB:ratio=3.0:attack=2:release=150:makeup=1,volume=${SURROUND_BOOST}" # Gate Cartoni: pulizia e musicalità
         ;;
     film)
-        VOICE_EQ="highpass=f=70,deesser=i=0.02:m=0.12:f=0.15,aexciter=level_in=1:level_out=1:amount=0.65:drive=2.25:blend=0:freq=2600:ceil=10000:listen=0,compand=attacks=0.0025:decays=0.015:points=-75/-75|-40/-39|-25/-20|-10/-7:soft-knee=5:gain=0.25"
+        VOICE_EQ="highpass=f=70,deesser=i=0.02:m=0.12:f=0.15,aexciter=level_in=1:level_out=1:amount=0.45:drive=1.8:blend=0:freq=2600:ceil=10000:listen=0,compand=attacks=0.0025:decays=0.015:points=-75/-75|-40/-39|-25/-20|-10/-7:soft-knee=5:gain=0.25"
         LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=70:width_type=q:w=1.8:g=0.5"
         COMPAND_PARAMS="attacks=0.01:decays=0.03:points=-60/-60|-25/-25|-12/-8:soft-knee=2:gain=0"
+        SURROUND_EQ="highpass=f=60,agate=threshold=-38dB:ratio=2.0:attack=5:release=400:makeup=1,volume=${SURROUND_BOOST}" # Gate Film: preserva atmosfera cinematografica
         ;;
     serie)
-        VOICE_EQ="highpass=f=70,deesser=i=0.02:m=0.12:f=0.15,aexciter=level_in=1:level_out=1:amount=0.65:drive=2.25:blend=0:freq=2600:ceil=10000:listen=0,compand=attacks=0.0025:decays=0.015:points=-75/-75|-40/-39|-25/-20|-10/-7:soft-knee=5:gain=0.25"
+        VOICE_EQ="highpass=f=70,deesser=i=0.02:m=0.12:f=0.15,aexciter=level_in=1:level_out=1:amount=0.45:drive=1.8:blend=0:freq=2600:ceil=10000:listen=0,compand=attacks=0.0025:decays=0.015:points=-75/-75|-40/-39|-25/-20|-10/-7:soft-knee=5:gain=0.25"
         LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=65:width_type=q:w=1.8:g=0.4"
         COMPAND_PARAMS="attacks=0.02:decays=0.05:points=-60/-60|-25/-25|-12/-8:soft-knee=2:gain=0"
+        SURROUND_EQ="highpass=f=60,agate=threshold=-35dB:ratio=2.5:attack=3:release=250:makeup=1,volume=${SURROUND_BOOST}" # Gate Serie TV: bilanciato per dialoghi frequenti
         ;;
     stereo)
-        VOICE_EQ="highpass=f=70,deesser=i=0.02:m=0.12:f=0.15,aexciter=level_in=1:level_out=1:amount=0.65:drive=2.25:blend=0:freq=2600:ceil=10000:listen=0,compand=attacks=0.0025:decays=0.015:points=-75/-75|-40/-39|-25/-20|-10/-7:soft-knee=5:gain=0.25"
+        VOICE_EQ="highpass=f=70,deesser=i=0.02:m=0.12:f=0.15,aexciter=level_in=1:level_out=1:amount=0.45:drive=1.8:blend=0:freq=2600:ceil=10000:listen=0,compand=attacks=0.0025:decays=0.015:points=-75/-75|-40/-39|-25/-20|-10/-7:soft-knee=5:gain=0.25"
         LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=65:width_type=q:w=1.8:g=0.4"
+        SURROUND_EQ="highpass=f=60,volume=${SURROUND_BOOST}" # Non utilizzato nel preset stereo
         ;;
 esac
 
 SIDECHAIN_PREP="bandpass=f=2200:width_type=h:w=2800,volume=2.6,compand=${COMPAND_PARAMS},agate=threshold=-30dB:ratio=2.0:attack=0.5:release=4000"
-SURROUND_EQ="highpass=f=60,volume=${SURROUND_BOOST}"
 FRONT_FX_EQ="highpass=f=80"
 
 # Riorganizzazione filtri finali

@@ -37,7 +37,7 @@ show_spinner() {
 # ==============================================================================
 # INIZIO DELLO SCRIPT PRINCIPALE
 # ==============================================================================
-# ducking_auto_cartoni.sh v1.6 - Audio Ottimizzato per Cartoni e Musical
+# ducking_auto_cartoni.sh v1.7 - Audio Ottimizzato per Cartoni e Musical
 #
 # + Analisi LUFS/True Peak completa con valutazione del contenuto
 # + Ottimizzazione adattiva per dialoghi e voci cantate perfettamente intellegibili
@@ -170,8 +170,8 @@ fi
 
 # Filtro voce italiana ultra-conservativo - solo processing essenziale
 #VOICE_EQ="highpass=f=85,deesser=i=0.12:m=0.4:f=0.23"
-VOICE_EQ="highpass=f=70,deesser=i=0.02:m=0.12:f=0.15,aexciter=level_in=1:level_out=1:amount=0.65:drive=2.25:blend=0:freq=2600:ceil=10000:listen=0,compand=attacks=0.0025:decays=0.015:points=-75/-75|-40/-39|-25/-20|-10/-7:soft-knee=5:gain=0.25"
-echo "APPLICATO: Filtro voce ultra-conservativo: HP dolce 70Hz + Exciter sottile + De-Esser chirurgico + Compand trasparente."
+VOICE_EQ="highpass=f=70,deesser=i=0.02:m=0.12:f=0.15,aexciter=level_in=1:level_out=1:amount=0.45:drive=1.8:blend=0:freq=2600:ceil=10000:listen=0,compand=attacks=0.0025:decays=0.015:points=-75/-75|-40/-39|-25/-20|-10/-7:soft-knee=5:gain=0.25"
+echo "APPLICATO: Filtro voce bilanciato: HP dolce + Exciter conservativo + De-Esser chirurgico + Compand trasparente."
 
 # Filtro LFE per cartoni
 LFE_EQ="equalizer=f=35:width_type=q:w=1.6:g=0.6,equalizer=f=75:width_type=q:w=1.8:g=0.4"
@@ -182,7 +182,7 @@ echo "OTTIMIZZATO: Canali front preservati per tecnologia Meridian LG SP7 + SPK8
 COMPAND_PARAMS="attacks=0.005:decays=0.01:points=-60/-60|-30/-30|-15/-8:soft-knee=2:gain=0"
 # Cartoni/Film - release più veloce:
 SIDECHAIN_PREP="bandpass=f=2200:width_type=h:w=2800,volume=2.6,compand=${COMPAND_PARAMS},agate=threshold=-30dB:ratio=2.0:attack=0.5:release=4000"
-SURROUND_EQ="highpass=f=60,volume=${SURROUND_BOOST}" # Boost surround variabile
+SURROUND_EQ="highpass=f=60,agate=threshold=-32dB:ratio=3.0:attack=2:release=150:makeup=1,volume=${SURROUND_BOOST}" # Gate Cartoni: pulizia e musicalità
 FRONT_FX_EQ="highpass=f=80" 
 
 # Riorganizzazione filtri finali

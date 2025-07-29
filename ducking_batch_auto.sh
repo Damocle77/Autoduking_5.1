@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ================================================================================
-# batch_ducking.sh v1.0 – "Libidine Batch Mode" alla Jerry Calà
+# batch_ducking.sh v1.7 – "Libidine Batch Mode" alla Jerry Calà
 # Batch per lanciare ducking_auto.sh su multipli MKV in una cartella.
 # Ctrl+C interrompe tutto: batch e processi figli, alla "Autodistruzione" di Alien.
 # ================================================================================

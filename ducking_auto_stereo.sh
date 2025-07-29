@@ -34,7 +34,7 @@ show_spinner() {
 # ==============================================================================
 # INIZIO DELLO SCRIPT PRINCIPALE
 # ==============================================================================
-# ducking_auto_serie_stereo.sh v1.6 Serie TV Stereo (No FX Ducking, No Surround)
+# ducking_auto_serie_stereo.sh v1.7 Serie TV Stereo (No FX Ducking, No Surround)
 #
 # + Analisi LUFS/True Peak con valutazione adattiva
 # + Boost vocale e controllo bassi morbido per dialoghi chiari
@@ -74,7 +74,8 @@ LUFS=$(echo "$ANALYSIS" | grep "Input Integrated" | awk '{print $3}' | sed 's/LU
 PEAK=$(echo "$ANALYSIS" | grep "Input True Peak" | awk '{print $4}' | sed 's/dBTP//')
 LRA=$(echo "$ANALYSIS" | grep "Input LRA" | awk '{print $3}' | sed 's/LU//')
 
-# -------------------- LOGICA ADATTIVA SEMPLIFICATA --------------------
+# -------------------- LOGICA ADATTIVA MIGLIORATA --------------------
+echo "RACCOMANDAZIONI AUTOMATICHE STEREO:"
 # NB. (LFE_REDUCTION -> Più ti avvicini a 1, meno riduzione stai applicando
 VOICE_BOOST=3.4
 LFE_REDUCTION=0.80
@@ -82,17 +83,37 @@ LFE_HP_FREQ=35
 MAKEUP_GAIN=5.0
 # NB. (MAKEUP_GAIN aumentato necessita di riduzione del limiter su FINAL_FILTER)
 
+# -------------------- LOGICA ADATTIVA COMPLETA --------------------
 if [ $(awk "BEGIN {print ($LUFS < -20) ? 1 : 0}") -eq 1 ]; then
-    VOICE_BOOST=$(awk "BEGIN {print $VOICE_BOOST + 0.5}")
-    MAKEUP_GAIN=$(awk "BEGIN {print $MAKEUP_GAIN + 0.6}")
+    VOICE_BOOST=$(awk "BEGIN {print $VOICE_BOOST + 0.1}")
+    MAKEUP_GAIN=$(awk "BEGIN {print $MAKEUP_GAIN + 0.2}")
+    echo "APPLICATO: Boost dialogo minimo (+0.1dB) per preservare bilanciamento stereo"
+    echo "APPLICATO: Makeup gain leggero (+0.2) per voci basse"
+elif [ $(awk "BEGIN {print ($LUFS > -16) ? 1 : 0}") -eq 1 ]; then
+    MAKEUP_GAIN=$(awk "BEGIN {print $MAKEUP_GAIN + 0.8}")
+    echo "APPLICATO: Voice boost invariato per preservare bilanciamento"
+    echo "APPLICATO: Makeup gain potenziato (+0.8) per livello finale corretto"
+else
+    echo "APPLICATO: Parametri stereo standard - bilanciamento ottimale"
+    echo "APPLICATO: Makeup gain principale (${MAKEUP_GAIN}) per volume finale corretto"
+fi
+
+# Controllo True Peak per LFE
+if [ $(awk "BEGIN {print ($PEAK > -2) ? 1 : 0}") -eq 1 ]; then
+    LFE_HP_FREQ=40
+    echo "APPLICATO: Taglio LFE più alto (${LFE_HP_FREQ}Hz) per mix ad alto impatto"
+else
+    echo "APPLICATO: Taglio LFE profondo (${LFE_HP_FREQ}Hz) per ambientazioni fantasy/sci-fi"
 fi
 
 # Filtro voce italiana ultra-conservativo - solo processing essenziale
 #VOICE_EQ="highpass=f=85,deesser=i=0.12:m=0.4:f=0.23"
-VOICE_EQ="highpass=f=70,deesser=i=0.02:m=0.12:f=0.15,aexciter=level_in=1:level_out=1:amount=0.65:drive=2.25:blend=0:freq=2600:ceil=10000:listen=0,compand=attacks=0.0025:decays=0.015:points=-75/-75|-40/-39|-25/-20|-10/-7:soft-knee=5:gain=0.25"
+VOICE_EQ="highpass=f=70,deesser=i=0.06:m=0.15:f=0.18,aexciter=level_in=1:level_out=1:amount=0.45:drive=1.8:blend=0.3:freq=2600:ceil=10000:listen=0,compand=attacks=0.0025:decays=0.015:points=-75/-75|-40/-38|-25/-18|-10/-6:soft-knee=5:gain=0.25"
 FC_FILTER="${VOICE_EQ},volume=${VOICE_BOOST},alimiter=level_in=1:level_out=1:limit=0.95:attack=2:release=70:asc=1"
 LFE_EQ="equalizer=f=30:width_type=q:w=1.5:g=0.6,equalizer=f=65:width_type=q:w=1.8:g=0.4"
 FINAL_FILTER="aresample=resampler=soxr:precision=28:cutoff=0.95:cheby=1,volume=${MAKEUP_GAIN},alimiter=level_in=1:level_out=1:limit=0.95:attack=2:release=100:asc=1,aformat=channel_layouts=stereo"
+echo "APPLICATO: Filtro voce bilanciato: HP dolce + Exciter conservativo + De-Esser efficace + Compand migliorato."
+echo "APPLICATO: LFE cinematografico arioso per definizione e impatto"
 
 # Preparazione filtri (anche se non utilizzati nel preset stereo)
 COMPAND_PARAMS="attacks=0.005:decays=0.01:points=-60/-60|-30/-30|-15/-8:soft-knee=2:gain=0"
@@ -126,6 +147,15 @@ secondi=$((duration % 60))
 if [ $ffmpeg_exit_code -eq 0 ]; then
     echo "==================== ELABORAZIONE COMPLETATA ====================="
     echo "SUCCESSO - Tempo: ${minuti}m ${secondi}s | Output: ${OUTPUT_FILE##*/}"
+    echo "Preset: Stereo Ottimizzato (EAC3 ${BITRATE})"
+    echo
+    echo "PARAMETRI FINALI APPLICATI:"
+    echo "Voice Boost: $VOICE_BOOST dB | LFE Reduction: $LFE_REDUCTION"
+    echo "Makeup Gain: $MAKEUP_GAIN | Limiter finale ottimizzato: 0.95"
+    echo
+    echo "MISURAZIONE ORIGINALE:"
+    echo "LUFS: $LUFS | True Peak: $PEAK dBTP | LRA: $LRA LU"
+    echo "==================================================================="
 else
     echo "ERRORE - Codice: $ffmpeg_exit_code"
     exit 1
