@@ -107,6 +107,43 @@ chmod +x *.sh
 
 ---
 
+## Script Batch
+
+Per l'elaborazione di massa di file video:
+
+| Script                      | Funzione                                 | Utilizzo                               |
+|-----------------------------|------------------------------------------|----------------------------------------|
+| `batch_film.sh`             | Elaborazione batch per film             | `./batch_film.sh /path/to/movies/`     |
+| `batch_serie.sh`            | Elaborazione batch per serie TV         | `./batch_serie.sh /path/to/series/`    |
+| `batch_cartoni.sh`          | Elaborazione batch per cartoni animati  | `./batch_cartoni.sh /path/to/cartoons/`|
+
+### Caratteristiche dei script batch:
+- **Elaborazione automatica:** Processa tutti i file `.mkv` in una directory
+- **Preservazione struttura:** Mantiene l'organizzazione originale dei file
+- **Log dettagliati:** Traccia il progresso e gli errori
+- **Controllo qualità:** Verifica l'integrità dei file processati
+
+---
+
+## Script Ausiliari
+
+Strumenti di supporto per analisi e manutenzione:
+
+| Script                      | Funzione                                 | Output                                 |
+|-----------------------------|------------------------------------------|----------------------------------------|
+| `analyze_audio.sh`          | Analisi dettagliata delle tracce audio | Report loudness, dinamica e spettro   |
+| `extract_audio.sh`          | Estrazione tracce audio                 | File audio separati (WAV/FLAC)        |
+| `validate_output.sh`        | Verifica qualità output                 | Report di conformità e errori         |
+| `cleanup_temp.sh`           | Pulizia file temporanei                 | Rimozione file di lavoro               |
+
+### Funzionalità degli script ausiliari:
+- **📊 Analisi avanzata:** Metriche dettagliate di loudness, true peak e range dinamico
+- **🔍 Verifica qualità:** Controllo automatico dell'integrità dell'output
+- **🧹 Manutenzione:** Pulizia automatica dei file temporanei
+- **📈 Reportistica:** Log dettagliati per debugging e ottimizzazione
+
+---
+
 ## Perché usarli
 
 - **🎯 Analisi automatica loudness:** Mix sempre bilanciato.
@@ -119,4 +156,4 @@ chmod +x *.sh
 
 ---
 
-> "Per riportare equilibrio nella Forza ti servono solo un terminale bash e questi script!"
+> "Per riportare equilibrio nella Forza ti servono solo un terminale bash e questi script. Questa è la via!"
