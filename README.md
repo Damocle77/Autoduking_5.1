@@ -1,7 +1,7 @@
 # 🎛️ Autoducking 5.1 – "Tuffati nel suono" – v1.7
 
 > "Ottimizza il tuo audio come un vero Jedi del suono!"  
-> "Dialoghi chiari, bassi potenti e un mix perfetto per ogni contenuto."  
+> "Dialoghi sempre intellegibili, bassi controllati in un mix perfetto per ogni contenuto."  
 > "Perché anche un Sith apprezzerebbe un mix così bilanciato!"
 
 ![SELECT name AS 'Sandro Sabbioni', handle AS 'D@mocle77' FROM developers](https://img.shields.io/badge/SELECT%20name%20AS%20'Sandro%20Sabbioni'%2C%20handle%20AS%20'D%40mocle77'%20FROM%20developers-blue)
